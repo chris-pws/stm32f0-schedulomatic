@@ -1,0 +1,1 @@
+The stm32f0-schedulomatic is a functioning framework that allows scheduling of data management (and other) tasks in parallel with DMA memory <-> peripheral i/o.
