@@ -3,15 +3,15 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 
-// ******* sys_tick_handler *******
-// Built-in SysTick ISR function. Runs the event manager and increments the counter.
-// Inputs: none
+// ******* rcc_init *******
+// Enables the clock for GPIO and other peripherals.
+//  Inputs: none
 // Outputs: none
 void rcc_init(void);
 
-// ******* sys_tick_handler *******
-// Built-in SysTick ISR function. Runs the event manager and increments the counter.
-// Inputs: none
+// ******* gpio_init *******
+// Initializes the GPIO registers and sets up peripheral and other output pins.
+//  Inputs: none
 // Outputs: none
 void gpio_init(void);
 

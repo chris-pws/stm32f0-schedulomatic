@@ -2,7 +2,7 @@
 
 // ******* Uart_init *******
 // Initializes the USART peripheral for serial communication.
-// Inputs: none
+//  Inputs: none
 // Outputs: none
 void Uart_init(void) 
 {
@@ -17,11 +17,33 @@ void Uart_init(void)
 
 }
 
+// ******* Uart_fifoTxEvent *******
+// Periodic event that manages the UART transmit queue.
+// Executed from the event scheduler.
+//  Inputs: buffer_fifo_t pointer, signal flag
+// Outputs: none
+void Uart_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt )
+{
+	uint32_t buf, len;
+	
+	// attempt to read a byte from the buffer.
+	if ( ( len = Buffer_fifoGet( &buf, buffer, 1 ) ) )
+	{
+		// Wait until transfer is complete
+		Sched_flagWait(flagPt);
+		// Copy byte to the buffer handler function
+		buffer->handler_function( &buf, len );
+
+	}
+
+	gpio_toggle(GPIOB, GPIO3);
+}
+
 // ******* Uart_dmaTxHandler *******
 // Copies a series of data from a memory address to the serial peripheral DMA
 // transmission channel.
-// Inputs: pointer to a contiguous block of data, the number of bytes.
-// (Up to a max of 4, depending on MSIZE and PSIZE settings in dma__int).
+//  Inputs: pointer to a contiguous block of data, the number of bytes.
+// (Depending on MSIZE and PSIZE settings in dma__int).
 // Outputs: none
 void Uart_dmaTxHandler( volatile void* data, uint8_t length ) 
 {
@@ -39,7 +61,7 @@ void Uart_dmaTxHandler( volatile void* data, uint8_t length )
 
 // ******* Uart_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
-// Inputs: pointer to a contiguous block of data, the number of bytes
+//  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
 void Uart_send( volatile void* data, uint32_t length ) 
 {

@@ -96,24 +96,3 @@ uint32_t Buffer_fifoGet( volatile void *data, buffer_fifo_t *buffer, uint32_t le
 	return j;
 }
 
-// ******* Buffer_fifoTxEvent *******
-// Periodic event that manages transmit queue.
-// Executed from the 
-//  Inputs: buffer_fifo_t pointer, signal flag
-// Outputs: none
-void Buffer_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt )
-{
-	uint32_t buf, len;
-	
-	// attempt to read a byte from the buffer.
-	if ( ( len = Buffer_fifoGet( &buf, buffer, 1 ) ) )
-	{
-		// Wait until transfer is complete
-		Sched_flagWait(flagPt);
-		// Copy byte to the buffer handler function
-		buffer->handler_function( &buf, len );
-
-	}
-
-	gpio_toggle(GPIOB, GPIO3);
-}

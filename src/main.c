@@ -7,8 +7,8 @@
 
 int main(void)
 {
-	int i;
-	uint32_t thetime;
+	volatile int i;
+	volatile uint32_t thetime;
 	char buf[14];
 	volatile int s;
 	uint8_t test[63][255];

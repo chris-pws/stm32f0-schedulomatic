@@ -11,6 +11,7 @@
 #define NUMEVENTS 2
 
 // Signaling flags
+extern int32_t Flag_DMA_Chan3;
 extern int32_t Flag_DMA_Chan4;
 extern int32_t Flag_test;
 
@@ -29,54 +30,58 @@ typedef struct eventTable_t eventTableType;
 
 // ******* Sched_Init *******
 // Initializes event scheduling manager
-// Inputs/Ouputs: none
+//  Inputs: none
+// Outputs: none
 void Sched_Init(void);
 
 // ******* Sched_flagInit *******
 // Initialize a counting semaphore
-// Inputs: pointer to a semaphore
-//         initial value of semaphore
+//  Inputs: pointer to a semaphore
+//          initial value of semaphore
 // Outputs: none
 void Sched_flagInit( int32_t *semaPt, int32_t value );
 
 // ******* Sched_flagWait *******
 // Decrement semaphore, blocking task if less than zero
-// Inputs: pointer to a counting semaphore
+//  Inputs: pointer to a counting semaphore
+// Outputs: none
 void Sched_flagWait( int32_t *semaPt );
 
 // ******* Sched_flagSignal *******
 // Increment semaphore
-// Inputs: pointer to a counting semaphore
+//  Inputs: pointer to a counting semaphore
+// Outputs: none
 void Sched_flagSignal( int32_t *semaPt );
 
 // ******* Sched_addEvent *******
 // Adds event to event management table
-// Inputs: pointer to a event function
-//         period in milliseconds
-//         pointer to a fifo type
-// Outputs: nothing
+//  Inputs: pointer to a event function
+//          period in milliseconds
+//          pointer to a fifo type
+// Outputs: none
 void Sched_addEvent( void(*function)( buffer_fifo_t*, int32_t *flagPt ), uint32_t period_cycles, buffer_fifo_t *buffer, int32_t *flagPt );
 
 // ******* Sched_runEventManager *******
 // Runs scheduler event manager
-// Inputs/Outputs: none
+//  Inputs: none
+// Outputs: none
 void Sched_runEventManager(void);
 
-// ******* Buffer_fifoTxEvent *******
-// Periodic event that manages transmit queue.
-// Inputs: fifo_t pointer, signal flag
+// ******* Uart_fifoTxEvent *******
+// Periodic event that manages the UART transmit queue.
+//  Inputs: fifo_t pointer, signal flag
 // Outputs: none
-extern void Buffer_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt );
+extern void Uart_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt );
 
 // ******* Uart_dmaTxHandler *******
 // Copies a series of data from a memory address to the serial peripheral DMA
 // transmission channel.
-// Inputs: pointer to a contiguous block of data, the number of bytes to copy
-// up to a maximum of 8 bytes.
+//  Inputs: pointer to a contiguous block of data, the number of bytes to copy
+//          up to a maximum of 8 bytes.
 // Outputs: none
 extern void Uart_dmaTxHandler( volatile void* data, uint8_t length );
 
-void test_process(buffer_fifo_t *buffer, int32_t *flagPt );
+void test_event(buffer_fifo_t *buffer, int32_t *flagPt );
 
 #define SCHEDULER_H_ 1
 #endif

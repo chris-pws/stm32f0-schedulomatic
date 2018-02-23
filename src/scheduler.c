@@ -5,6 +5,7 @@ eventTableType events[NUMEVENTS];
 buffer_fifo_t fifo_uartTx[1];
 buffer_fifo_t fifo_test[1];
 
+int32_t Flag_DMA_Chan3;
 int32_t Flag_DMA_Chan4;
 int32_t Flag_test;
 
@@ -13,18 +14,21 @@ int32_t Flag_test;
 void Sched_Init(void) {
 
 	Sched_flagInit( &Flag_DMA_Chan4, 1 ); // flag for UART_tx DMA
+	Sched_flagInit( &Flag_DMA_Chan3, 1 ); // flag for SPI_tx DMA
 	Sched_flagInit( &Flag_test, 1 ); // test flag for test event
 	Buffer_fifoInit( fifo_uartTx, &Uart_dmaTxHandler );
+	//Buffer_fifoInit( fifo_spiTx, &Spi_dmaTxHandler );
 	// pointer to process, time interval, a data queue, a signal flag pointer
-	Sched_addEvent( &Buffer_fifoTxEvent, 1, fifo_uartTx, &Flag_DMA_Chan4 );
-	Sched_addEvent( &test_process, 100, fifo_test, &Flag_test );
+	Sched_addEvent( &Uart_fifoTxEvent, 1, fifo_uartTx, &Flag_DMA_Chan4 );
+	//Sched_addEvent( &Buffer_spiTxEvent, 1, fifo_spiTx, &Flag_DMA_Chan3 );
+	Sched_addEvent( &test_event, 100, fifo_test, &Flag_test );
 
 }
 
 // ******* Sched_flagInit *******
 // Initialize a counting semaphore
-// Inputs: pointer to a semaphore
-//         initial value of semaphore
+//  Inputs: pointer to a semaphore
+//          initial value of semaphore
 // Outputs: none
 void Sched_flagInit( int32_t *flagPt, int32_t value ) 
 {
@@ -34,7 +38,8 @@ void Sched_flagInit( int32_t *flagPt, int32_t value )
 
 // ******* Sched_waitFlag *******
 // Decrement semaphore, blocking task if less than zero.
-// Inputs: pointer to a counting semaphore
+//  Inputs: pointer to a counting semaphore
+// Outputs: none
 void Sched_flagWait( int32_t *flagPt ) 
 {
 	(*flagPt)--;
@@ -43,7 +48,8 @@ void Sched_flagWait( int32_t *flagPt )
 
 // ******* Sched_flagSignal *******
 // Increment semaphore. Value > 0 indicates ready status.
-// Inputs: pointer to a counting semaphore
+//  Inputs: pointer to a counting semaphore
+// Outputs: none
 void Sched_flagSignal( int32_t *flagPt )
 {
 	(*flagPt)++;
@@ -51,10 +57,10 @@ void Sched_flagSignal( int32_t *flagPt )
 
 // ******* Sched_addEvent *******
 // Adds event to event management table
-// Inputs: pointer to a event function
-//         period in cycles through the event queue
-//         pointer to a fifo type
-// Outputs: nothing
+//  Inputs: pointer to a event function
+//          period in cycles through the event queue
+//          pointer to a fifo type
+// Outputs: none
 void Sched_addEvent( void(*function)( buffer_fifo_t*, int32_t *flagPt ), uint32_t period_cycles, buffer_fifo_t *buffer, int32_t *flagPt )
 {
 	int j;
@@ -75,7 +81,8 @@ void Sched_addEvent( void(*function)( buffer_fifo_t*, int32_t *flagPt ), uint32_
 // ******* Sched_runEventManager *******
 // Executes functions based on a series of conditions,
 // including elapsed time since last run and busy signals.
-// Inputs/Outputs: none
+//  Inputs: none
+// Outputs: none
 void Sched_runEventManager(void)
 {
 	cm_disable_interrupts();
@@ -102,7 +109,7 @@ void Sched_runEventManager(void)
 	cm_enable_interrupts();
 }
 
-void test_process(buffer_fifo_t *buffer, int32_t *flagPt )
+void test_event(buffer_fifo_t *buffer, int32_t *flagPt )
 {
 	gpio_toggle(GPIOB, GPIO8);
 }

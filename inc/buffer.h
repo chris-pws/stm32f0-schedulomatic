@@ -6,7 +6,6 @@
 
 #define BUFFERSIZE 1024
 
-
 /*
 
 TO-DO: Define root buffer class, subclassing for different queue types
@@ -55,18 +54,6 @@ uint32_t Buffer_fifoGet( volatile void *data, buffer_fifo_t *buffer, uint32_t le
 //  Inputs: buffer_fifo_t pointer
 // Outputs: number of bytes contained in the buffer.
 uint32_t Buffer_fifoStat( buffer_fifo_t *buffer );
-
-// ******* Buffer_fifoTxEvent *******
-// Periodic event that manages transmit queue.
-// Executed from the 
-//  Inputs: buffer_fifo_t pointer, signal flag
-// Outputs: none
-void Buffer_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt );
-
-// ******* Sched_flagWait *******
-// Decrement semaphore, blocking task if less than zero
-// Inputs: pointer to a counting semaphore
-extern void Sched_flagWait( int32_t *semaPt );
 
 #define BUFFER_H_ 1
 #endif

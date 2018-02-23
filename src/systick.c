@@ -4,7 +4,7 @@ uint32_t systickCount = UINT32_MAX - 5000;
 
 // ******* Systick_init *******
 // Initializes the SysTick interrupt timer.
-// Inputs: none
+//  Inputs: none
 // Outputs: none
 void Systick_init(void)
 {
@@ -21,7 +21,7 @@ void Systick_init(void)
 
 // ******* Systick_timeGetCount *******
 // Returns the elapsed program time based on the count of SysTick interrupts.
-// Inputs: none
+//  Inputs: none
 // Outputs: A count of elapsed cycles.
 uint32_t Systick_timeGetCount(void)
 {
@@ -31,7 +31,7 @@ uint32_t Systick_timeGetCount(void)
 // ******* Systick_timeDelta *******
 // Provides the difference between two program times, as provided by 
 // Systick_get_time().
-// Inputs: A start time and an end time.
+//  Inputs: A start time and an end time.
 // Outputs: The delta between two points in execution time.
 uint32_t Systick_timeDelta( uint32_t start, uint32_t end )
 {

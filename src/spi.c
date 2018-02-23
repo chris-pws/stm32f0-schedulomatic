@@ -3,17 +3,27 @@
 // ******* Spi_init *******
 // Initializes the SPI peripheral for simplex serial transmission.
 // 9 bits per word
-// Inputs: none
+//  Inputs: none
 // Outputs: none
 void Spi_init(void)
 {
-	
+
+}
+
+// ******* Uart_fifoTxEvent *******
+// Periodic event that manages the UART transmit queue.
+// Executed from the event scheduler.
+//  Inputs: buffer_fifo_t pointer, signal flag
+// Outputs: none
+void Uart_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt )
+{
+
 }
 
 // ******* Spi_dmaTxHandler *******
 // Copies data from a memory address to the SPI peripheral DMA transmission 
 // channel.
-// Inputs: pointer to a contiguous block of data, the number of bytes
+//  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
 void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 {
@@ -22,7 +32,7 @@ void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 
 // ******* Spi_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
-// Inputs: pointer to a contiguous block of data, the number of bytes
+//  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
 void Spi_send( volatile void* data, uint32_t length )
 {
