@@ -10,8 +10,9 @@ int main(void)
 	volatile int i;
 	volatile uint32_t thetime;
 	char buf[14];
+	char test[] = "boob";
 	volatile int s;
-	uint8_t test[63][255];
+	//uint8_t test[63][255];
 
 	rcc_init();
 	gpio_init();
@@ -21,12 +22,10 @@ int main(void)
 	Sched_Init();
 	Systick_init();
 
+
 	while (1) {
 
 		for ( i = 0; i < 1000000; i++ );
-		Uart_send( "Hello World!Hello World!Hello World!Hello World!\n\r", 50 );
-		Uart_send( "Hello World!Hello World!Hello World!Hello World!\n\r", 50 );
-		Uart_send( "Hello World!Hello World!Hello World!Hello World!\n\r", 50 );
 	}
 	return 0;
 }

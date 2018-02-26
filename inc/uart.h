@@ -18,7 +18,7 @@ void Uart_init(void);
 // Executed from the event scheduler.
 //  Inputs: buffer_fifo_t pointer, signal flag
 // Outputs: none
-void Uart_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt );
+void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt );
 
 // ******* Uart_dmaTxHandler *******
 // Copies a series of data from a memory address to the serial peripheral DMA

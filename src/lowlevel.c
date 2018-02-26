@@ -25,8 +25,9 @@ void gpio_init(void) {
 
 	// LED for debugging purposes
 	gpio_mode_setup( PORT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_LED );
-	// Line for timing/debugging measurements
-	gpio_mode_setup( GPIOB, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO3 );
+	// Lines for timing/debugging measurements
+	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG1 );
+	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG2 );
 	
 	// SPI software
 	/*

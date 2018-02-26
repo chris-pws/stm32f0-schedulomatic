@@ -8,20 +8,22 @@
 #include "systick.h"
 #include "buffer.h"
 
-#define NUMEVENTS 2
+#define NUMEVENTS 1
 
 // Signaling flags
 extern int32_t Flag_DMA_Chan3;
 extern int32_t Flag_DMA_Chan4;
 extern int32_t Flag_test;
 
-extern buffer_fifo_t fifo_uartTx[1];
+// Buffer parameter initialization stubs
+extern buffer_param_t fifo_uartTx_param;
+extern struct buffer_param fifo_spiTx_param;
 
 // Scheduler event management table
 struct eventTable_t {
 	// event function is executed in the event scheduler loop
-	void(*eventFunction)( buffer_fifo_t*, int32_t *flagPt ); 
-	buffer_fifo_t *buffer; // pointer to data queue related to the particular event.
+	void(*eventFunction)( buffer_param_t *buffer, int32_t *flagPt ); 
+	buffer_param_t *buffer; // pointer to data queue related to the particular event.
 	int32_t *flag; // pointer to an initialized semaphore for event signaling.
 	uint32_t interval; // how often the manager function will be called.
 	uint32_t last; // time of last execution.
@@ -59,7 +61,11 @@ void Sched_flagSignal( int32_t *semaPt );
 //          period in milliseconds
 //          pointer to a fifo type
 // Outputs: none
-void Sched_addEvent( void(*function)( buffer_fifo_t*, int32_t *flagPt ), uint32_t period_cycles, buffer_fifo_t *buffer, int32_t *flagPt );
+void Sched_addEvent( 
+	void(*function)( buffer_param_t *buffer, int32_t *flagPt ),
+	uint32_t period_cycles, 
+	void *buffer, 
+	int32_t *flagPt );
 
 // ******* Sched_runEventManager *******
 // Runs scheduler event manager
@@ -71,7 +77,7 @@ void Sched_runEventManager(void);
 // Periodic event that manages the UART transmit queue.
 //  Inputs: fifo_t pointer, signal flag
 // Outputs: none
-extern void Uart_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt );
+extern void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt );
 
 // ******* Uart_dmaTxHandler *******
 // Copies a series of data from a memory address to the serial peripheral DMA
@@ -81,7 +87,7 @@ extern void Uart_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt );
 // Outputs: none
 extern void Uart_dmaTxHandler( volatile void* data, uint8_t length );
 
-void test_event(buffer_fifo_t *buffer, int32_t *flagPt );
+void test_event( buffer_fifo_u8_t *buffer, int32_t *flagPt );
 
 #define SCHEDULER_H_ 1
 #endif

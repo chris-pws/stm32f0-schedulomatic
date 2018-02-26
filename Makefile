@@ -111,8 +111,10 @@ upload: $(TARGET_HEX)
 #######################################################
 
 gdb: all
-	/opt/gcc-arm-none-eabi-5_3-2016q1/bin/arm-none-eabi-gdb $(TARGET_ELF)
+	/usr/bin/arm-none-eabi-gdb $(TARGET_ELF)
 
 # Start OpenOCD GDB server (supports semihosting)
 openocd: 
-	openocd -f board/st_nucleo_f0.cfg
+	openocd -f /home/cms/openocd/tcl/board/st_nucleo_f0.cfg \
+	        -f /home/cms/openocd/tcl/interface/stlink-v2-1.cfg \
+			-c "init" -c "reset init"	        

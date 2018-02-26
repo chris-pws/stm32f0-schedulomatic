@@ -2,8 +2,20 @@
 
 eventTableType events[NUMEVENTS];
 
-buffer_fifo_t fifo_uartTx[1];
-buffer_fifo_t fifo_test[1];
+buffer_fifo_u8_t fifo_uartTx[1];
+buffer_fifo_u16_t fifo_spiTx[1];
+buffer_fifo_u8_t fifo_test[1];
+
+buffer_param_t fifo_uartTx_param = 
+    { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_uartTx } };
+
+// buffer_param_t fifo_spiTx_param;
+// fifo_spiTx_param.type = FIFO_U16T;
+// fifo_spiTx_param.is.fifo_u16 = &fifo_uartTx;
+
+// buffer_param_t fifo_test_param;
+// fifo_test_param.type = FIFO_U8T;
+// fifo_test_param.is.fifo_u8 = &fifo_test;
 
 int32_t Flag_DMA_Chan3;
 int32_t Flag_DMA_Chan4;
@@ -16,12 +28,13 @@ void Sched_Init(void) {
 	Sched_flagInit( &Flag_DMA_Chan4, 1 ); // flag for UART_tx DMA
 	Sched_flagInit( &Flag_DMA_Chan3, 1 ); // flag for SPI_tx DMA
 	Sched_flagInit( &Flag_test, 1 ); // test flag for test event
-	Buffer_fifoInit( fifo_uartTx, &Uart_dmaTxHandler );
+	//Buffer_init( fifo_uartTx_param, &Uart_dmaTxHandler );
+
 	//Buffer_fifoInit( fifo_spiTx, &Spi_dmaTxHandler );
 	// pointer to process, time interval, a data queue, a signal flag pointer
-	Sched_addEvent( &Uart_fifoTxEvent, 1, fifo_uartTx, &Flag_DMA_Chan4 );
+	//Sched_addEvent( &Uart_fifoTxEvent, 1, &fifo_uartTx_param, &Flag_DMA_Chan4 );
 	//Sched_addEvent( &Buffer_spiTxEvent, 1, fifo_spiTx, &Flag_DMA_Chan3 );
-	Sched_addEvent( &test_event, 100, fifo_test, &Flag_test );
+	//Sched_addEvent( &test_event, 100, fifo_test, &Flag_test );
 
 }
 
@@ -61,7 +74,11 @@ void Sched_flagSignal( int32_t *flagPt )
 //          period in cycles through the event queue
 //          pointer to a fifo type
 // Outputs: none
-void Sched_addEvent( void(*function)( buffer_fifo_t*, int32_t *flagPt ), uint32_t period_cycles, buffer_fifo_t *buffer, int32_t *flagPt )
+void Sched_addEvent( 
+	void(*function)( buffer_param_t *buffer, int32_t *flagPt ),
+	uint32_t period_cycles, 
+	void *buffer, 
+	int32_t *flagPt )
 {
 	int j;
 	for ( j = 0; j < NUMEVENTS; j++ )
@@ -92,16 +109,19 @@ void Sched_runEventManager(void)
 	for ( j = 0; j < NUMEVENTS; j++ )
 	{
 		now = Systick_timeGetCount();
-		// Number of program execution cycles since last execution.
+
+		/* Number of program execution cycles since last execution.
+		*/
 		diff = Systick_timeDelta( events[j].last, now );
-		// if: reception conditions are true (at or past interval delta, task flag > 0), run event
+
+		/* if: reception conditions are true (at or past interval delta, 
+		   task flag > 0), run event
+		*/
 		if ( ( diff >= events[j].interval ) && ( (*events[j].flag) ) )  
 		{
-			//gpio_set(GPIOA, GPIO10);
-			//gpio_toggle(GPIOA, GPIO10);
-			events[j].eventFunction(events[j].buffer, events[j].flag);
-			//now = Systick_get_time();
+			events[j].eventFunction( events[j].buffer, events[j].flag );
 			events[j].last = now;
+
 		}			
 		
 	}
@@ -109,7 +129,7 @@ void Sched_runEventManager(void)
 	cm_enable_interrupts();
 }
 
-void test_event(buffer_fifo_t *buffer, int32_t *flagPt )
+void test_event(buffer_fifo_u8_t *buffer, int32_t *flagPt )
 {
 	gpio_toggle(GPIOB, GPIO8);
 }

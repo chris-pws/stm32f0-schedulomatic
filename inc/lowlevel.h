@@ -3,6 +3,26 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 
+// LED for debugging
+#define PORT_LED GPIOB
+#define GPIO_LED GPIO8
+// Lines for troubleshooting timing or logic
+#define PORT_SIG GPIOC
+#define GPIO_SIG1 GPIO0
+#define GPIO_SIG2 GPIO1
+
+//PORT B
+#define SPI_PORT GPIOB
+//PB3
+#define SCK	GPIO3
+//PB5
+#define MOSI GPIO5
+//Below are controlled in software
+//PA8
+#define RST	GPIO8
+//PB0
+#define CSN	GPIO0
+
 // ******* rcc_init *******
 // Enables the clock for GPIO and other peripherals.
 //  Inputs: none
@@ -14,23 +34,6 @@ void rcc_init(void);
 //  Inputs: none
 // Outputs: none
 void gpio_init(void);
-
-// LED for debugging
-#define PORT_LED GPIOB
-#define GPIO_LED GPIO8
-
-//PORT A
-#define SPI_PORT GPIOA
-//PA8
-#define RST	GPIO8
-//PA4
-#define CSN	GPIO4
-//PA5
-#define SCK	GPIO5
-//PA7
-#define MOSI GPIO7
-//PA6
-#define MISO GPIO6
 
 
 #define LOWLEVEL_H_ 1

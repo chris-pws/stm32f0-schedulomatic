@@ -22,17 +22,17 @@ void Uart_init(void)
 // Executed from the event scheduler.
 //  Inputs: buffer_fifo_t pointer, signal flag
 // Outputs: none
-void Uart_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt )
+void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 {
-	uint32_t buf, len;
+	uint16_t buf[1], len;
 	
 	// attempt to read a byte from the buffer.
-	if ( ( len = Buffer_fifoGet( &buf, buffer, 1 ) ) )
+	if ( ( len = Buffer_get( &buf, buffer, 1 ) ) )
 	{
 		// Wait until transfer is complete
 		Sched_flagWait(flagPt);
 		// Copy byte to the buffer handler function
-		buffer->handler_function( &buf, len );
+		//buffer->is.u8->handler_function( &buf, len );
 
 	}
 
@@ -66,6 +66,6 @@ void Uart_dmaTxHandler( volatile void* data, uint8_t length )
 void Uart_send( volatile void* data, uint32_t length ) 
 {
 
-	Buffer_fifoPut(data, fifo_uartTx, length);
+	Buffer_put( data, fifo_uartTx_param_t, length );
 
 }
