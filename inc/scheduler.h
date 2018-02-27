@@ -19,6 +19,8 @@ extern int32_t Flag_test;
 extern buffer_param_t fifo_uartTx_param;
 extern buffer_param_t fifo_spiTx_param;
 
+extern struct buffer_fifo_u16 fifo_spiTx[1];
+
 // Scheduler event management table
 struct eventTable_t {
 	// event function is executed in the event scheduler loop

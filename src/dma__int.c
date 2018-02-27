@@ -77,12 +77,13 @@ void dma1_channel2_3_isr(void)
 	// Channel 3 is SPI1_TX
 	if ( ( isr & DMA_ISR_TCIF3 ) || ( isr & DMA_ISR_TEIF3 ) )
 	{
-		//gpio_toggle(GPIOB, GPIO3); // LED2 on/off 
-		DMA1_IFCR |= DMA_IFCR_CGIF3;	//Clear flag
+		
+		DMA1_IFCR |= DMA_IFCR_CGIF3;	//Clear flags
 		//dma_channel_reset(DMA1, DMA_CHANNEL2);
 		// Clear NSS pin
+		Spi_end();
 		Sched_flagSignal( &Flag_DMA_Chan3 );
-		
+		//gpio_toggle(GPIOB, GPIO3); // LED2 on/off 
 	}
 
 }

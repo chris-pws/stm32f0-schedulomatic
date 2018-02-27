@@ -23,19 +23,32 @@ void Spi_init(void)
 }
 
 // ******* Spi_fifoTxEvent *******
-// Periodic event that manages the SPI transmit queue.
+// Periodic event that manages the SPI transmission queue.
 // Executed from the event scheduler.
 //  Inputs: buffer_param_t pointer, signal flag
 // Outputs: none
 void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 {
+	uint16_t buf[2], len;
+	
+	// attempt to read an element from the buffer.
+	if ( ( len = Buffer_get( &buf, buffer, 1 ) ) )
+	{
+		// Wait until transaction is complete
+		Sched_flagWait(flagPt);
+		Spi_begin();
+		// Send data to the buffer handler function
+		buffer->is.fifo_u16->handler_function( &buf, len );
 
+	}
+
+	//gpio_toggle(GPIOB, GPIO3);
 }
 
 // ******* Spi_dmaTxHandler *******
 // Copies data from a memory address to the SPI peripheral DMA transmission 
 // channel.
-//  Inputs: pointer to a contiguous block of data, the number of bytes to copy
+//  Inputs: pointer to a contiguous block of data, number of elements to copy
 // Outputs: none
 void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 {
@@ -50,18 +63,18 @@ void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 }
 
 // ******* Spi_send *******
-// Adds arbitrary number of bytes to the UART transmission buffer.
-//  Inputs: pointer to a contiguous block of data, the number of bytes
+// Adds arbitrary number of elements to the UART transmission buffer.
+//  Inputs: pointer to a contiguous block of data, number of elements to copy
 // Outputs: none
 void Spi_send( volatile void* data, uint32_t length )
 {
-	Buffer_fifoPut(data, fifo_spiTx, length);
+	Buffer_put(data, fifo_spiTx_param, length);
 
 }
 
 // ******* Spi_csnHigh *******
 // Sets the software controlled chip select line high.
-//  Inputs: 
+//  Inputs: none
 // Outputs: none
 void Spi_csnHigh(void) {
 	gpio_set(SPI_PORT, CSN);

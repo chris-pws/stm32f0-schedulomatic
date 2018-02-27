@@ -1,7 +1,7 @@
 #include "buffer.h"
 
 // ******* Buffer_Init *******
-// Initializes a FIFO queue structure, preparing it for usage.
+// Initializes a buffer parameter structure, preparing it for usage.
 // Inputs: Pointer to buffer_param_t.
 //		   Function pointer called by the event scheduler to handle queue processing.
 // Ouputs: None
@@ -29,10 +29,11 @@ void Buffer_init( buffer_param_t *buffer,
 
 }
 
-// ******* Buffer_Put *******
-// Appends a length of data to a supplied buffer.
-//  Inputs: pointer to incoming data, pointer to a buffer_param_t, data length
-// Outputs: number of bytes inserted successfully
+// ******* Buffer_put *******
+// Public function that appends data to a specified buffer based on the
+// buffer parameter structure provided.
+//  Inputs: pointer to data, pointer to a buffer_param_t, data length
+// Outputs: number of elements inserted successfully
 uint32_t Buffer_put( volatile void *in_buf, 
 	buffer_param_t *buffer, 
 	uint32_t length )
@@ -60,21 +61,18 @@ uint32_t Buffer_put( volatile void *in_buf,
 	return 0;
 }
 
-	
-
-	
-	
-
-// ******* Buffer_Get *******
-// Retrieves and removes data from a specified buffer.
-//  Inputs: Pointer to the outgoing data address, pointer to a buffer_param_t, 
-//          number of elements to retrieve.
-// Outputs: number of bytes read into the data pointer.
+// ******* Buffer_get *******
+// Public function that retrieves and removes data from a buffer corresponding
+// to the supplied buffer parameter structure.
+//  Inputs: data pointer, buffer_param_t pointer, and number of elements to
+//          read.
+// Outputs: number of elements read into the data pointer.
 uint32_t Buffer_get( volatile void *out_buf, 
 	buffer_param_t *buffer, 
 	uint32_t length )
 {
 	uint32_t num_read;
+
 
 	/*
 	*  Call the specialized helper function corresponding to the supplied 
@@ -84,6 +82,8 @@ uint32_t Buffer_get( volatile void *out_buf,
 	{
 		case FIFO_U8T:
 			num_read = buffer_fifo_u8_get( out_buf, buffer->is.fifo_u8, length );
+			//s = sprintf(test, "%ld", num_read);
+			//Uart_dmaTxHandler(test, s);
 			return num_read;
 			break;
 
@@ -97,11 +97,11 @@ uint32_t Buffer_get( volatile void *out_buf,
 }
 
 // ******* buffer_fifo_u8_put *******
-// Appends a length of data to a supplied buffer.
+// Private function that appends data to a supplied buffer.
 //  Inputs: pointer to data, pointer to a buffer_fifo_t, data length
-// Outputs: number of elements queued successfully
+// Outputs: number of elements inserted successfully
 uint32_t buffer_fifo_u8_put( volatile void *in_buf, 
-	buffer_fifo_u8_t *b_u8t, 
+	struct buffer_fifo_u8 *b_u8t, 
 	uint32_t length )
 {
 	cm_disable_interrupts();
@@ -118,7 +118,6 @@ uint32_t buffer_fifo_u8_put( volatile void *in_buf,
 		*  if advancing the putPt to the next element in the buffer is met with
 		*  the getPt. First handle wrapping if we've reached the buffersize.
 		*/ 
-
 		if ( nextPutPt == (uint32_t*)&b_u8t->data[B_SIZE_FIFO_U8T] ) 
 		{
 			nextPutPt = (uint32_t*)&b_u8t->data[0];
@@ -131,6 +130,7 @@ uint32_t buffer_fifo_u8_put( volatile void *in_buf,
 		}
 
 		(*b_u8t->putPt) = *p++;
+
 		// advance pointer address to next buffer element
 		b_u8t->putPt = (uint32_t*)&b_u8t->putPt[1]; 
 
@@ -146,11 +146,11 @@ uint32_t buffer_fifo_u8_put( volatile void *in_buf,
 }
 
 // ******* buffer_fifo_u8_get *******
-// Retrieves and removes data from a specified buffer.
-//  Inputs: data pointer, buffer_fifo_t pointer, and number of bytes to the read.
-// Outputs: number of elements read to the data pointer.
+// Private function to retrieve and remove data from a specified buffer.
+//  Inputs: data pointer, buffer_fifo_t pointer, and number of elements to read
+// Outputs: number of elements read into the data pointer.
 uint32_t buffer_fifo_u8_get( volatile void *out_buf, 
-	buffer_fifo_u8_t *b_u8t, 
+	struct buffer_fifo_u8 *b_u8t, 
 	uint32_t length )
 {
 	cm_disable_interrupts();
@@ -164,7 +164,6 @@ uint32_t buffer_fifo_u8_get( volatile void *out_buf,
 		// Check for get & put pointer collision
 		if ( b_u8t->getPt != b_u8t->putPt )
 		{
-
 			*p++ = (*b_u8t->getPt);
 
 			b_u8t->getPt = (uint32_t*)&b_u8t->getPt[1];
@@ -188,11 +187,11 @@ uint32_t buffer_fifo_u8_get( volatile void *out_buf,
 }
 
 // ******* buffer_fifo_u16_put *******
-// Appends a length of data to a supplied buffer.
+// Private function that appends data to a supplied buffer.
 //  Inputs: pointer to data, pointer to a buffer_fifo_t, data length
-// Outputs: number of elements queued successfully
+// Outputs: number of elements inserted successfully
 uint32_t buffer_fifo_u16_put( volatile void *in_buf, 
-	buffer_fifo_u16_t *b_u16t, 
+	struct buffer_fifo_u16 *b_u16t, 
 	uint32_t length )
 {
 	cm_disable_interrupts();
@@ -237,11 +236,11 @@ uint32_t buffer_fifo_u16_put( volatile void *in_buf,
 }
 
 // ******* buffer_fifo_u16_get *******
-// Retrieves and removes data from a specified buffer.
-//  Inputs: data pointer, buffer_fifo_t pointer, and number of bytes to the read.
-// Outputs: number of elements read to the data pointer.
+// Private function to retrieve and remove data from a specified buffer.
+//  Inputs: data pointer, buffer_fifo_t pointer, and number of elements to read
+// Outputs: number of elements read into the data pointer.
 uint32_t buffer_fifo_u16_get( volatile void *out_buf, 
-	buffer_fifo_u16_t *b_u16t, 
+	struct buffer_fifo_u16 *b_u16t, 
 	uint32_t length )
 {
 	cm_disable_interrupts();

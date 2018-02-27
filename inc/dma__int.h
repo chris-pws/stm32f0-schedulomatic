@@ -45,5 +45,11 @@ extern void Sched_flagSignal( int32_t *semaPt );
 // Outputs: none
 extern void Sched_runEventManager(void);
 
+// ******* Spi_end *******
+// Called at the end of an SPI word transfer.
+//  Inputs: none
+// Outputs: none
+extern void Spi_end(void);
+
 #define DMA__INT_H_ 1
 #endif

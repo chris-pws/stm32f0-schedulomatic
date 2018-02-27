@@ -9,8 +9,6 @@ int main(void)
 {
 	volatile int i;
 	volatile uint32_t thetime;
-	char buf[14];
-	char test[] = "boob";
 	volatile int s;
 	//uint8_t test[63][255];
 
@@ -26,6 +24,10 @@ int main(void)
 	while (1) {
 
 		for ( i = 0; i < 1000000; i++ );
+		Uart_send( "Hello World!Hello World!Hello World!Hello World!\n\r", 50 );
+		Uart_send( "Hello World!Hello World!Hello World!Hello World!\n\r", 50 );
+		Uart_send( "Hello World!Hello World!Hello World!Hello World!\n\r", 50 );
+		Uart_send( "Hello World!Hello World!Hello World!Hello World!\n\r", 50 );
 	}
 	return 0;
 }

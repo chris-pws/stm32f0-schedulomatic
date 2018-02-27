@@ -2,8 +2,8 @@
 
 eventTableType events[NUMEVENTS];
 
-buffer_fifo_u8_t fifo_uartTx[1];
-buffer_fifo_u16_t fifo_spiTx[1];
+struct buffer_fifo_u8 fifo_uartTx[1];
+struct buffer_fifo_u16 fifo_spiTx[1];
 
 buffer_param_t fifo_uartTx_param = 
     { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_uartTx } };
@@ -24,7 +24,7 @@ void Sched_init(void) {
 	Sched_flagInit( &Flag_test, 1 ); // test flag for test event
 
 	Buffer_init( &fifo_uartTx_param, &Uart_dmaTxHandler );
-	//Buffer_init( &fifo_spiTx_param, &Spi_dmaTxHandler );
+	Buffer_init( &fifo_spiTx_param, &Spi_dmaTxHandler );
 
 	/* pointer to process, time interval, a data queue parameter, a signal flag
 	*/ 
