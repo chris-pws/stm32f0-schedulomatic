@@ -2,8 +2,13 @@
 
 #include <stdint.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/spi.h>
+#include <libopencm3/stm32/dma.h>
+#include <libopencm3/stm32/rcc.h>
 
 #include "lowlevel.h"
+#include "scheduler.h"
+#include "buffer.h"
 
 // ******* Spi_init *******
 // Initializes the SPI peripheral for simplex serial transmission.
@@ -55,6 +60,12 @@ void Spi_begin(void);
 //  Inputs: none
 // Outputs: none
 void Spi_end(void);
+
+// ******* Uart_send *******
+// Adds arbitrary number of bytes to the UART transmission buffer.
+//  Inputs: pointer to a contiguous block of data, the number of bytes
+// Outputs: none
+extern void Uart_send( volatile void* data, uint32_t length );
 
 #define SPI_H_ 1
 #endif

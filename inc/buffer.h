@@ -118,5 +118,11 @@ uint32_t buffer_fifo_u16_get( volatile void *out_buf,
 // Outputs: number of elements contained in the buffer.
 uint32_t Buffer_stat( buffer_param_t *buffer );
 
+// ******* Uart_send *******
+// Adds arbitrary number of bytes to the UART transmission buffer.
+//  Inputs: pointer to a contiguous block of data, the number of bytes
+// Outputs: none
+extern void Uart_send( volatile void* data, uint32_t length );
+
 #define BUFFER_H_ 1
 #endif

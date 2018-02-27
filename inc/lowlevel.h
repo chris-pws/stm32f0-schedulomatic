@@ -6,10 +6,12 @@
 // LED for debugging
 #define PORT_LED GPIOB
 #define GPIO_LED GPIO8
-// Lines for troubleshooting timing or logic
+// Lines for troubleshooting timing and logic
 #define PORT_SIG GPIOC
-#define GPIO_SIG1 GPIO0
-#define GPIO_SIG2 GPIO1
+#define GPIO_SIG0 GPIO0
+#define GPIO_SIG1 GPIO1
+#define GPIO_SIG2 GPIO2
+#define GPIO_SIG3 GPIO3
 
 //PORT B
 #define SPI_PORT GPIOB
@@ -22,6 +24,12 @@
 #define RST	GPIO8
 //PB0
 #define CSN	GPIO0
+
+// ******* Low_init *******
+// Enables low-level initialization of clocks, pins, and peripherals.
+//  Inputs: none
+// Outputs: none
+void Low_init(void);
 
 // ******* rcc_init *******
 // Enables the clock for GPIO and other peripherals.

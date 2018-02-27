@@ -1,7 +1,7 @@
 #Project settings
 PROJECT_NAME = ssd1322_oled
 SOURCES = main.c lowlevel.c dma__int.c systick.c scheduler.c buffer.c uart.c
-#SOURCES += spi.c
+SOURCES += spi.c
 BUILD_DIR = build/
 
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)%.o)
@@ -112,7 +112,12 @@ upload: $(TARGET_HEX)
 #######################################################
 
 gdb: all
-	/usr/bin/arm-none-eabi-gdb $(TARGET_ELF)
+	/usr/bin/arm-none-eabi-gdb main.o
+
+insight: all
+	/usr/local/bin/arm-none-eabi-insight \
+			--eval-command="target remote localhost:3333" \
+			$(TARGET_ELF)
 
 # Start OpenOCD GDB server (supports semihosting)
 openocd: 
