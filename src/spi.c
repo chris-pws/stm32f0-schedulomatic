@@ -25,9 +25,9 @@ void Spi_init(void)
 // ******* Spi_fifoTxEvent *******
 // Periodic event that manages the SPI transmit queue.
 // Executed from the event scheduler.
-//  Inputs: buffer_fifo_t pointer, signal flag
+//  Inputs: buffer_param_t pointer, signal flag
 // Outputs: none
-void Spi_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt )
+void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 {
 
 }
@@ -35,7 +35,7 @@ void Spi_fifoTxEvent( buffer_fifo_t *buffer, int32_t *flagPt )
 // ******* Spi_dmaTxHandler *******
 // Copies data from a memory address to the SPI peripheral DMA transmission 
 // channel.
-//  Inputs: pointer to a contiguous block of data, the number of bytes
+//  Inputs: pointer to a contiguous block of data, the number of bytes to copy
 // Outputs: none
 void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 {

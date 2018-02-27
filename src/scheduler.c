@@ -4,18 +4,12 @@ eventTableType events[NUMEVENTS];
 
 buffer_fifo_u8_t fifo_uartTx[1];
 buffer_fifo_u16_t fifo_spiTx[1];
-buffer_fifo_u8_t fifo_test[1];
 
 buffer_param_t fifo_uartTx_param = 
     { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_uartTx } };
 
-// buffer_param_t fifo_spiTx_param;
-// fifo_spiTx_param.type = FIFO_U16T;
-// fifo_spiTx_param.is.fifo_u16 = &fifo_uartTx;
-
-// buffer_param_t fifo_test_param;
-// fifo_test_param.type = FIFO_U8T;
-// fifo_test_param.is.fifo_u8 = &fifo_test;
+buffer_param_t fifo_spiTx_param = 
+    { .type = FIFO_U16T, .is= { .fifo_u16 = fifo_spiTx } };
 
 int32_t Flag_DMA_Chan3;
 int32_t Flag_DMA_Chan4;
@@ -23,18 +17,20 @@ int32_t Flag_test;
 
 // ******* Sched_Init *******
 // Initializes system task scheduler.
-void Sched_Init(void) {
+void Sched_init(void) {
 
 	Sched_flagInit( &Flag_DMA_Chan4, 1 ); // flag for UART_tx DMA
 	Sched_flagInit( &Flag_DMA_Chan3, 1 ); // flag for SPI_tx DMA
 	Sched_flagInit( &Flag_test, 1 ); // test flag for test event
-	//Buffer_init( fifo_uartTx_param, &Uart_dmaTxHandler );
 
-	//Buffer_fifoInit( fifo_spiTx, &Spi_dmaTxHandler );
-	// pointer to process, time interval, a data queue, a signal flag pointer
-	//Sched_addEvent( &Uart_fifoTxEvent, 1, &fifo_uartTx_param, &Flag_DMA_Chan4 );
-	//Sched_addEvent( &Buffer_spiTxEvent, 1, fifo_spiTx, &Flag_DMA_Chan3 );
-	//Sched_addEvent( &test_event, 100, fifo_test, &Flag_test );
+	Buffer_init( &fifo_uartTx_param, &Uart_dmaTxHandler );
+	//Buffer_init( &fifo_spiTx_param, &Spi_dmaTxHandler );
+
+	/* pointer to process, time interval, a data queue parameter, a signal flag
+	*/ 
+	Sched_addEvent( &Uart_fifoTxEvent, 1, &fifo_uartTx_param, &Flag_DMA_Chan4 );
+	//Sched_addEvent( &Spi_fifoTxEvent, 1, &fifo_spiTx_param, &Flag_DMA_Chan3 );
+	Sched_addEvent( &test_event, 100, &fifo_uartTx_param, &Flag_test );
 
 }
 
@@ -77,7 +73,7 @@ void Sched_flagSignal( int32_t *flagPt )
 void Sched_addEvent( 
 	void(*function)( buffer_param_t *buffer, int32_t *flagPt ),
 	uint32_t period_cycles, 
-	void *buffer, 
+	buffer_param_t *buffer, 
 	int32_t *flagPt )
 {
 	int j;
@@ -129,7 +125,7 @@ void Sched_runEventManager(void)
 	cm_enable_interrupts();
 }
 
-void test_event(buffer_fifo_u8_t *buffer, int32_t *flagPt )
+void test_event( buffer_param_t *buffer, int32_t *flagPt )
 {
 	gpio_toggle(GPIOB, GPIO8);
 }

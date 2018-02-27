@@ -8,7 +8,7 @@
 #include "systick.h"
 #include "buffer.h"
 
-#define NUMEVENTS 1
+#define NUMEVENTS 2
 
 // Signaling flags
 extern int32_t Flag_DMA_Chan3;
@@ -17,7 +17,7 @@ extern int32_t Flag_test;
 
 // Buffer parameter initialization stubs
 extern buffer_param_t fifo_uartTx_param;
-extern struct buffer_param fifo_spiTx_param;
+extern buffer_param_t fifo_spiTx_param;
 
 // Scheduler event management table
 struct eventTable_t {
@@ -34,7 +34,7 @@ typedef struct eventTable_t eventTableType;
 // Initializes event scheduling manager
 //  Inputs: none
 // Outputs: none
-void Sched_Init(void);
+void Sched_init(void);
 
 // ******* Sched_flagInit *******
 // Initialize a counting semaphore
@@ -64,7 +64,7 @@ void Sched_flagSignal( int32_t *semaPt );
 void Sched_addEvent( 
 	void(*function)( buffer_param_t *buffer, int32_t *flagPt ),
 	uint32_t period_cycles, 
-	void *buffer, 
+	buffer_param_t *buffer, 
 	int32_t *flagPt );
 
 // ******* Sched_runEventManager *******
@@ -83,11 +83,24 @@ extern void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt );
 // Copies a series of data from a memory address to the serial peripheral DMA
 // transmission channel.
 //  Inputs: pointer to a contiguous block of data, the number of bytes to copy
-//          up to a maximum of 8 bytes.
 // Outputs: none
 extern void Uart_dmaTxHandler( volatile void* data, uint8_t length );
 
-void test_event( buffer_fifo_u8_t *buffer, int32_t *flagPt );
+// ******* Spi_fifoTxEvent *******
+// Periodic event that manages the SPI transmission queue.
+// Executed from the event scheduler.
+//  Inputs: buffer_fifo_t pointer, signal flag
+// Outputs: none
+extern void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt );
+
+// ******* Spi_dmaTxHandler *******
+// Copies data from a memory address to the SPI peripheral DMA transmission 
+// channel.
+//  Inputs: pointer to a contiguous block of data, the number of bytes to copy
+// Outputs: none
+extern void Spi_dmaTxHandler( volatile void* data, uint8_t length );
+
+void test_event( buffer_param_t *buffer, int32_t *flagPt );
 
 #define SCHEDULER_H_ 1
 #endif

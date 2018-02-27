@@ -66,6 +66,6 @@ void Uart_dmaTxHandler( volatile void* data, uint8_t length )
 void Uart_send( volatile void* data, uint32_t length ) 
 {
 
-	Buffer_put( data, fifo_uartTx_param_t, length );
+	Buffer_put( data, &fifo_uartTx_param, length );
 
 }

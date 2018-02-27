@@ -19,7 +19,7 @@ int main(void)
 	Uart_init();
 	dma_uartTxInit();
 	nvic_init();
-	Sched_Init();
+	Sched_init();
 	Systick_init();
 
 
