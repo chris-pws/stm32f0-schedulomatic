@@ -1,5 +1,15 @@
 #include "lowlevel.h"
 
+// ******* Low_init *******
+// Enables low-level initialization of clocks, pins, and peripherals.
+//  Inputs: none
+// Outputs: none
+void Low_init(void) {
+	rcc_init();
+	gpio_init();
+
+}
+
 // ******* rcc_init *******
 // Enables the clock for GPIO and other peripherals.
 //  Inputs: none

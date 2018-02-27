@@ -8,7 +8,7 @@
 #include "systick.h"
 #include "buffer.h"
 
-#define NUMEVENTS 2
+#define NUMEVENTS 3
 
 // Signaling flags
 extern int32_t Flag_DMA_Chan3;
@@ -19,10 +19,8 @@ extern int32_t Flag_test;
 extern buffer_param_t fifo_uartTx_param;
 extern buffer_param_t fifo_spiTx_param;
 
-extern struct buffer_fifo_u16 fifo_spiTx[1];
-
-// Scheduler event management table
-struct eventTable_t {
+// Scheduler event table
+struct sched_eventTable {
 	// event function is executed in the event scheduler loop
 	void(*eventFunction)( buffer_param_t *buffer, int32_t *flagPt ); 
 	buffer_param_t *buffer; // pointer to data queue related to the particular event.
@@ -30,7 +28,6 @@ struct eventTable_t {
 	uint32_t interval; // how often the manager function will be called.
 	uint32_t last; // time of last execution.
 };
-typedef struct eventTable_t eventTableType;
 
 // ******* Sched_Init *******
 // Initializes event scheduling manager

@@ -13,6 +13,12 @@ extern int32_t Flag_DMA_Chan3;
 extern int32_t Flag_DMA_Chan4;
 extern uint32_t systickCount;
 
+// ******* Dma_init *******
+// Meta function that initializes the DMA peripheral.
+//  Inputs: none
+// Outputs: none
+void Dma_init(void);
+
 // ******* nvic_init *******
 // Initilizes the Nested Vector Interrupt Controller.
 //  Inputs: none
@@ -44,6 +50,18 @@ extern void Sched_flagSignal( int32_t *semaPt );
 //  Inputs: none
 // Outputs: none
 extern void Sched_runEventManager(void);
+
+// ******* Spi_end *******
+// Called at the end of an SPI word transfer.
+//  Inputs: none
+// Outputs: none
+extern void Spi_end(void);
+
+// ******* Uart_send *******
+// Adds arbitrary number of bytes to the UART transmission buffer.
+//  Inputs: pointer to a contiguous block of data, the number of bytes
+// Outputs: none
+extern void Uart_send( volatile void* data, uint32_t length );
 
 #define DMA__INT_H_ 1
 #endif

@@ -36,7 +36,7 @@ void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 
 	}
 
-	gpio_toggle(GPIOB, GPIO3);
+	//gpio_toggle(GPIOB, GPIO3);
 }
 
 // ******* Uart_dmaTxHandler *******

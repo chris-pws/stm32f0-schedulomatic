@@ -1,10 +1,23 @@
 #include "dma__int.h"
 
-// ******* nvic_init *******
-// Initilizes the Nested Vector Interrupt Controller.
+// ******* Dma_init *******
+// Meta function that prepares the configured peripherals for DMA access.
 //  Inputs: none
 // Outputs: none
-void nvic_init(void) {
+void Dma_init(void) 
+{
+	nvic_init();
+	dma_uartTxInit();
+	dma_spiTxInit();
+
+}
+
+// ******* nvic_init *******
+// Initializes the Nested Vector Interrupt Controller.
+//  Inputs: none
+// Outputs: none
+void nvic_init(void) 
+{
 	nvic_set_priority(NVIC_DMA1_CHANNEL4_5_IRQ, 3);
 	nvic_enable_irq(NVIC_DMA1_CHANNEL4_5_IRQ);
 	nvic_set_priority(NVIC_DMA1_CHANNEL2_3_IRQ, 2);
@@ -16,7 +29,8 @@ void nvic_init(void) {
 // transmission.
 //  Inputs: none
 // Outputs: none
-void dma_uartTxInit(void) {
+void dma_uartTxInit(void) 
+{
 	dma_channel_reset(DMA1, DMA_CHANNEL4);
 	dma_set_peripheral_address(DMA1, DMA_CHANNEL4, (uint32_t) &USART2_TDR);
 	dma_set_read_from_memory(DMA1, DMA_CHANNEL4);
@@ -61,7 +75,7 @@ void dma_spiTxInit(void) {
 	//copying 9 bit words
 	dma_set_peripheral_size(DMA1, DMA_CHANNEL3, DMA_CCR_PSIZE_16BIT);
 	dma_set_memory_size(DMA1, DMA_CHANNEL3, DMA_CCR_MSIZE_16BIT);
-	dma_set_priority(DMA1, DMA_CHANNEL3, DMA_CCR_PL_VERY_HIGH);
+	dma_set_priority(DMA1, DMA_CHANNEL3, DMA_CCR_PL_HIGH);
 }
 
 // ******* dma1_channel2_3_isr *******
@@ -77,12 +91,14 @@ void dma1_channel2_3_isr(void)
 	// Channel 3 is SPI1_TX
 	if ( ( isr & DMA_ISR_TCIF3 ) || ( isr & DMA_ISR_TEIF3 ) )
 	{
-		//gpio_toggle(GPIOB, GPIO3); // LED2 on/off 
-		DMA1_IFCR |= DMA_IFCR_CGIF3;	//Clear flag
+		
+		DMA1_IFCR |= DMA_IFCR_CGIF3;	//Clear flags
 		//dma_channel_reset(DMA1, DMA_CHANNEL2);
 		// Clear NSS pin
+		Spi_end();
 		Sched_flagSignal( &Flag_DMA_Chan3 );
-		
+		Uart_send("boob", 4);
+		//gpio_toggle(GPIOB, GPIO3); // LED2 on/off 
 	}
 
 }

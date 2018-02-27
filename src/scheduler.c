@@ -1,6 +1,13 @@
 #include "scheduler.h"
 
-eventTableType events[NUMEVENTS];
+struct sched_eventTable events[NUMEVENTS];
+
+/* Declare event mutex flags, and declare and assign the buffer paramater
+*  type structs.
+*/
+int32_t Flag_DMA_Chan3;
+int32_t Flag_DMA_Chan4;
+int32_t Flag_test;
 
 struct buffer_fifo_u8 fifo_uartTx[1];
 struct buffer_fifo_u16 fifo_spiTx[1];
@@ -11,10 +18,6 @@ buffer_param_t fifo_uartTx_param =
 // buffer_param_t fifo_spiTx_param = 
 //     { .type = FIFO_U16T, .is= { .fifo_u16 = fifo_spiTx } };
 
-int32_t Flag_DMA_Chan3;
-int32_t Flag_DMA_Chan4;
-int32_t Flag_test;
-
 // ******* Sched_Init *******
 // Initializes system task scheduler.
 void Sched_init(void) {
@@ -24,12 +27,12 @@ void Sched_init(void) {
 	Sched_flagInit( &Flag_test, 1 ); // test flag for test event
 
 	Buffer_init( &fifo_uartTx_param, &Uart_dmaTxHandler );
-	//Buffer_init( &fifo_spiTx_param, &Spi_dmaTxHandler );
+	Buffer_init( &fifo_spiTx_param, &Spi_dmaTxHandler );
 
 	/* pointer to process, time interval, a data queue parameter, a signal flag
 	*/ 
-	Sched_addEvent( &Uart_fifoTxEvent, 1, &fifo_uartTx_param, &Flag_DMA_Chan4 );
-	//Sched_addEvent( &Spi_fifoTxEvent, 1, &fifo_spiTx_param, &Flag_DMA_Chan3 );
+	Sched_addEvent( &Uart_fifoTxEvent, 10, &fifo_uartTx_param, &Flag_DMA_Chan4 );
+	Sched_addEvent( &Spi_fifoTxEvent, 1, &fifo_spiTx_param, &Flag_DMA_Chan3 );
 	Sched_addEvent( &test_event, 100, &fifo_uartTx_param, &Flag_test );
 
 }
