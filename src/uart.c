@@ -32,7 +32,7 @@ void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 		// Wait until transfer is complete
 		Sched_flagWait(flagPt);
 		// Copy byte to the buffer handler function
-		//buffer->is.u8->handler_function( &buf, len );
+		buffer->is.fifo_u8->handler_function( &buf, len );
 
 	}
 

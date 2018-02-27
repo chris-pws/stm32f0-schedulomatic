@@ -2,14 +2,14 @@
 
 eventTableType events[NUMEVENTS];
 
-buffer_fifo_u8_t fifo_uartTx[1];
-buffer_fifo_u16_t fifo_spiTx[1];
+struct buffer_fifo_u8 fifo_uartTx[1];
+struct buffer_fifo_u16 fifo_spiTx[1];
 
 buffer_param_t fifo_uartTx_param = 
     { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_uartTx } };
 
-buffer_param_t fifo_spiTx_param = 
-    { .type = FIFO_U16T, .is= { .fifo_u16 = fifo_spiTx } };
+// buffer_param_t fifo_spiTx_param = 
+//     { .type = FIFO_U16T, .is= { .fifo_u16 = fifo_spiTx } };
 
 int32_t Flag_DMA_Chan3;
 int32_t Flag_DMA_Chan4;
