@@ -17,6 +17,8 @@ buffer_param_t fifo_uartTx_param =
 
 // buffer_param_t fifo_spiTx_param = 
 //     { .type = FIFO_U16T, .is= { .fifo_u16 = fifo_spiTx } };
+buffer_param_t fifo_spiTx_param = 
+    { .type = FIFO_U16T, .is= { .fifo_u16 = fifo_spiTx } };
 
 // ******* Sched_Init *******
 // Initializes system task scheduler.
@@ -32,6 +34,7 @@ void Sched_init(void) {
 	/* pointer to process, time interval, a data queue parameter, a signal flag
 	*/ 
 	Sched_addEvent( &Uart_fifoTxEvent, 10, &fifo_uartTx_param, &Flag_DMA_Chan4 );
+	Sched_addEvent( &Uart_fifoTxEvent, 1, &fifo_uartTx_param, &Flag_DMA_Chan4 );
 	Sched_addEvent( &Spi_fifoTxEvent, 1, &fifo_spiTx_param, &Flag_DMA_Chan3 );
 	Sched_addEvent( &test_event, 100, &fifo_uartTx_param, &Flag_test );
 

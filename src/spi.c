@@ -8,15 +8,19 @@
 void Spi_init(void)
 {
 	spi_reset(SPI1);
-	spi_enable_software_slave_management(SPI1);
-	spi_disable_tx_buffer_empty_interrupt(SPI1);
-	spi_set_next_tx_from_buffer(SPI1);
-	spi_set_bidirectional_transmit_only_mode(SPI1);
+
+	SPI1_I2SCFGR = 0;
+
+	spi_init_master(SPI1, SPI_CR1_BR_FPCLK_DIV_256, 
+		SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_2, 
+		SPI_CR1_DFF_16BIT, SPI_CR1_MSBFIRST);
 	spi_set_data_size( SPI1, SPI_CR2_DS_9BIT );
-	spi_set_clock_polarity_0(SPI1);
-	spi_set_clock_phase_0(SPI1);
-	spi_send_msb_first(SPI1);
-	spi_set_baudrate_prescaler( SPI1, SPI_CR1_BR_FPCLK_DIV_256 );
+
+	spi_enable_software_slave_management(SPI1);
+	spi_set_nss_high(SPI1);
+	//spi_set_next_tx_from_buffer(SPI1);
+	//spi_set_nss_low(SPI1);
+
 	Spi_csnHigh();
 	spi_enable(SPI1);
 
@@ -55,6 +59,9 @@ void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 {
 	dma_disable_channel(DMA1, DMA_CHANNEL3);
+	Spi_init();
+	dma_channel_reset(DMA1, DMA_CHANNEL3);
+	dma_spiTxInit();
 
 	dma_set_memory_address(DMA1, DMA_CHANNEL3, (uint32_t) data);
 	dma_set_number_of_data(DMA1, DMA_CHANNEL3, length);
@@ -104,5 +111,6 @@ void Spi_begin(void) {
 //  Inputs: none
 // Outputs: none
 void Spi_end(void) {
+	spi_disable_rx_dma(SPI1);
 	Spi_csnHigh();
 }

@@ -16,11 +16,12 @@ void Low_init(void) {
 // Outputs: none
 void rcc_init(void) {
 	rcc_clock_setup_in_hsi_out_48mhz();
-	rcc_periph_clock_enable(RCC_USART2);
-	rcc_periph_clock_enable(RCC_SPI1);
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_GPIOC);
 	rcc_periph_clock_enable(RCC_DMA);
+	rcc_periph_clock_enable(RCC_SPI1);
+	rcc_periph_clock_enable(RCC_USART2);
 }
 
 // ******* gpio_init *******
@@ -36,8 +37,10 @@ void gpio_init(void) {
 	// LED for debugging purposes
 	gpio_mode_setup( PORT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_LED );
 	// Lines for timing/debugging measurements
+	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG0 );
 	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG1 );
 	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG2 );
+	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG3 );
 	
 	// SPI software
 	/*
@@ -48,10 +51,14 @@ void gpio_init(void) {
 
 	// SPI peripheral pins
 	gpio_mode_setup( SPI_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, SCK|MOSI );
-	gpio_set_af( SPI_PORT, GPIO_AF1, SCK|MOSI );
+	gpio_set_af( SPI_PORT, GPIO_AF0, SCK|MOSI );
+	gpio_set_output_options( SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, SCK );
+	
 
 	// Additional software controlled SPI pins
-	gpio_mode_setup( SPI_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST|CSN );
-	gpio_set_output_options( SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, RST|CSN );
+	gpio_mode_setup( SPI_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, CSN );
+	gpio_set_output_options( SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, CSN );
+	gpio_mode_setup( RST_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST );
+	gpio_set_output_options( RST_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, RST );
 }
 

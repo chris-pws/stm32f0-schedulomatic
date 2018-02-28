@@ -19,11 +19,15 @@
 #define SCK	GPIO3
 //PB5
 #define MOSI GPIO5
+#define MISO GPIO4
 //Below are controlled in software
-//PA8
-#define RST	GPIO8
 //PB0
 #define CSN	GPIO0
+//PORT A
+#define RST_PORT GPIOA
+//PA8
+#define RST	GPIO8
+
 
 // ******* Low_init *******
 // Enables low-level initialization of clocks, pins, and peripherals.
