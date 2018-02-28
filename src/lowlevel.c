@@ -16,11 +16,12 @@ void Low_init(void) {
 // Outputs: none
 void rcc_init(void) {
 	rcc_clock_setup_in_hsi_out_48mhz();
-	rcc_periph_clock_enable(RCC_USART2);
-	rcc_periph_clock_enable(RCC_SPI1);
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_AFIO);
 	rcc_periph_clock_enable(RCC_DMA);
+	rcc_periph_clock_enable(RCC_SPI1);
+	rcc_periph_clock_enable(RCC_USART2);
 }
 
 // ******* gpio_init *******
@@ -48,6 +49,7 @@ void gpio_init(void) {
 
 	// SPI peripheral pins
 	gpio_mode_setup( SPI_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, SCK|MOSI );
+	gpio_set_output_options( SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, SCK|MOSI )
 	gpio_set_af( SPI_PORT, GPIO_AF1, SCK|MOSI );
 
 	// Additional software controlled SPI pins

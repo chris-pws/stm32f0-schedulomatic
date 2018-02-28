@@ -8,15 +8,16 @@
 void Spi_init(void)
 {
 	spi_reset(SPI1);
+
+	SPI1_I2SCFGR = 0;
+
+	spi_init_master(SPI1, SPI_CR1_BR_FPCLK_DIV_256, 
+		SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_2, 
+		SPI_CR1_DFF_16BIT, SPI_CR1_MSBFIRST);
+
 	spi_enable_software_slave_management(SPI1);
-	spi_disable_tx_buffer_empty_interrupt(SPI1);
-	spi_set_next_tx_from_buffer(SPI1);
-	spi_set_bidirectional_transmit_only_mode(SPI1);
-	spi_set_data_size( SPI1, SPI_CR2_DS_9BIT );
-	spi_set_clock_polarity_0(SPI1);
-	spi_set_clock_phase_0(SPI1);
-	spi_send_msb_first(SPI1);
-	spi_set_baudrate_prescaler( SPI1, SPI_CR1_BR_FPCLK_DIV_256 );
+	spi_set_nss_high(SPI1);
+
 	Spi_csnHigh();
 	spi_enable(SPI1);
 
@@ -104,5 +105,6 @@ void Spi_begin(void) {
 //  Inputs: none
 // Outputs: none
 void Spi_end(void) {
+	spi_disable_rx_dma(SPI1);
 	Spi_csnHigh();
 }

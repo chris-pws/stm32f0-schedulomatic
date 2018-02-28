@@ -94,6 +94,8 @@ void dma1_channel2_3_isr(void)
 		
 		DMA1_IFCR |= DMA_IFCR_CGIF3;	//Clear flags
 		//dma_channel_reset(DMA1, DMA_CHANNEL2);
+		spi_disable_tx_dma(SPI1);
+		dma_disable_channel(DMA1, DMA_CHANNEL3);
 		// Clear NSS pin
 		Spi_end();
 		Sched_flagSignal( &Flag_DMA_Chan3 );
