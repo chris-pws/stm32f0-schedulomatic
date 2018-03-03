@@ -12,7 +12,8 @@ int main(void)
 	volatile uint32_t thetime;
 	volatile int s;
 	//uint8_t test[63][255];
-	uint16_t tester = 0x13F;
+	volatile uint16_t tester;
+	uint16_t gob = 0x14D;
 
 	Low_init();
 	Dma_init();
@@ -25,12 +26,14 @@ int main(void)
 
 
 	while (1) {
-
-		Uart_send( " cockle ", 8 );
-		for ( i = 0; i < 1000000; i++ );
-		Spi_send( &tester, 1 );
-		for ( i = 0; i < 1000000; i++ );
-		
+		for ( tester = 0; i < UINT16_MAX - 1; tester++ )
+		{
+			Uart_send( " cockle ", 8 );
+			for ( i = 0; i < 10000; i++ );
+			Spi_send( &tester, 1 );
+			for ( i = 0; i < 10000; i++ );
+			//SPI1_DR = gob;
+		}
 	}
 	return 0;
 }

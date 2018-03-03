@@ -6,9 +6,10 @@
 // Outputs: none
 void Dma_init(void) 
 {
-	nvic_init();
+	
 	dma_uartTxInit();
 	dma_spiTxInit();
+	nvic_init();
 
 }
 
@@ -18,10 +19,10 @@ void Dma_init(void)
 // Outputs: none
 void nvic_init(void) 
 {
-	nvic_set_priority(NVIC_DMA1_CHANNEL4_5_IRQ, 3);
-	nvic_enable_irq(NVIC_DMA1_CHANNEL4_5_IRQ);
-	nvic_set_priority(NVIC_DMA1_CHANNEL2_3_IRQ, 2);
-	nvic_enable_irq(NVIC_DMA1_CHANNEL2_3_IRQ);
+	nvic_set_priority( NVIC_DMA1_CHANNEL4_5_IRQ, 0 );
+	nvic_enable_irq( NVIC_DMA1_CHANNEL4_5_IRQ );
+	nvic_set_priority( NVIC_DMA1_CHANNEL2_3_IRQ, 0 );
+	nvic_enable_irq( NVIC_DMA1_CHANNEL2_3_IRQ );
 }
 
 // ******* dma_uartTxInit *******
@@ -31,13 +32,13 @@ void nvic_init(void)
 // Outputs: none
 void dma_uartTxInit(void) 
 {
-	dma_channel_reset(DMA1, DMA_CHANNEL4);
-	dma_set_peripheral_address(DMA1, DMA_CHANNEL4, (uint32_t) &USART2_TDR);
-	dma_set_read_from_memory(DMA1, DMA_CHANNEL4);
-	dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL4);
-	dma_set_peripheral_size(DMA1, DMA_CHANNEL4, DMA_CCR_PSIZE_8BIT);
-	dma_set_memory_size(DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT);
-	dma_set_priority(DMA1, DMA_CHANNEL4, DMA_CCR_PL_HIGH);
+	dma_channel_reset( DMA1, DMA_CHANNEL4 );
+	dma_set_peripheral_address( DMA1, DMA_CHANNEL4, (uint32_t) &USART2_TDR );
+	dma_set_read_from_memory( DMA1, DMA_CHANNEL4 );
+	dma_enable_memory_increment_mode( DMA1, DMA_CHANNEL4 );
+	dma_set_peripheral_size( DMA1, DMA_CHANNEL4, DMA_CCR_PSIZE_8BIT );
+	dma_set_memory_size( DMA1, DMA_CHANNEL4, DMA_CCR_MSIZE_8BIT );
+	dma_set_priority( DMA1, DMA_CHANNEL4, DMA_CCR_PL_HIGH );
 }
 
 // ******* dma1_channel4_5_isr *******
@@ -53,7 +54,7 @@ void dma1_channel4_5_isr(void)
 	// Channel 4 is UART2_TX
 	if ( ( isr & DMA_ISR_TCIF4 ) || ( isr & DMA_ISR_TEIF4 ) )
 	{
-		gpio_toggle(GPIOB, GPIO3); 
+		//gpio_toggle( GPIOB, GPIO3 ); 
 		DMA1_IFCR |= DMA_IFCR_CGIF4;	//Clear flag
 		//dma_channel_reset(DMA1, DMA_CHANNEL2);
 		Sched_flagSignal( &Flag_DMA_Chan4 );
@@ -68,14 +69,15 @@ void dma1_channel4_5_isr(void)
 //  Inputs: none
 // Outputs: none
 void dma_spiTxInit(void) {
-	dma_channel_reset(DMA1, DMA_CHANNEL3);
-	dma_set_peripheral_address(DMA1, DMA_CHANNEL3, (uint32_t) &SPI1_DR);
-	dma_set_read_from_memory(DMA1, DMA_CHANNEL3);
-	dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL3);
+	dma_channel_reset( DMA1, DMA_CHANNEL3 );
+	dma_set_peripheral_address( DMA1, DMA_CHANNEL3, (uint32_t) &SPI1_DR );
+	dma_set_read_from_memory( DMA1, DMA_CHANNEL3 );
+	dma_enable_memory_increment_mode( DMA1, DMA_CHANNEL3 );
+	dma_disable_peripheral_increment_mode(DMA1, DMA_CHANNEL3);
 	//copying 9 bit words
-	dma_set_peripheral_size(DMA1, DMA_CHANNEL3, DMA_CCR_PSIZE_16BIT);
-	dma_set_memory_size(DMA1, DMA_CHANNEL3, DMA_CCR_MSIZE_16BIT);
-	dma_set_priority(DMA1, DMA_CHANNEL3, DMA_CCR_PL_HIGH);
+	dma_set_peripheral_size( DMA1, DMA_CHANNEL3, DMA_CCR_PSIZE_16BIT );
+	dma_set_memory_size( DMA1, DMA_CHANNEL3, DMA_CCR_MSIZE_16BIT );
+	dma_set_priority( DMA1, DMA_CHANNEL3, DMA_CCR_PL_HIGH );
 }
 
 // ******* dma1_channel2_3_isr *******
@@ -92,16 +94,23 @@ void dma1_channel2_3_isr(void)
 	if ( ( isr & DMA_ISR_TCIF3 ) || ( isr & DMA_ISR_TEIF3 ) )
 	{
 		
-		DMA1_IFCR |= DMA_IFCR_CGIF3;	//Clear flags
-		//dma_channel_reset(DMA1, DMA_CHANNEL2);
-		dma_disable_transfer_complete_interrupt(DMA1, DMA_CHANNEL3);
+		DMA1_IFCR |= DMA_IFCR_CGIF3;	/* Clear flags */
+
 		spi_disable_tx_dma(SPI1);
 		dma_disable_channel(DMA1, DMA_CHANNEL3);
-		// Clear NSS pin
-		Spi_end();
+		
+		/* Ensure the transmit register is empty and the SPI is not busy */
+		while ( ! ( SPI_SR(SPI1) & SPI_SR_TXE ) );
+		while ( SPI_SR(SPI1) & SPI_SR_BSY );
+
 		Sched_flagSignal( &Flag_DMA_Chan3 );
-		Uart_send("int", 4);
-		//gpio_toggle(GPIOB, GPIO3); // LED2 on/off 
+		Uart_send(" int ", 5);
+		//gpio_toggle(GPIOB, GPIO3); 	/* LED2 on/off */
+
+	}
+	else
+	{
+		Uart_send(" stint ", 7);
 	}
 
 }

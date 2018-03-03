@@ -6,27 +6,21 @@
 // LED for debugging
 #define PORT_LED GPIOB
 #define GPIO_LED GPIO8
-// Lines for troubleshooting timing and logic
+// Pins for troubleshooting timing and logic
 #define PORT_SIG GPIOC
 #define GPIO_SIG0 GPIO0
 #define GPIO_SIG1 GPIO1
 #define GPIO_SIG2 GPIO2
 #define GPIO_SIG3 GPIO3
 
-//PORT B
-#define SPI_PORT GPIOB
-//PB3
-#define SCK	GPIO3
-//PB5
-#define MOSI GPIO5
-#define MISO GPIO4
-//Below are controlled in software
-//PB0
-#define CSN	GPIO0
-//PORT A
-#define RST_PORT GPIOA
-//PA8
-#define RST	GPIO8
+// PORT A
+#define PORT_SPI GPIOA
+#define SCK	GPIO5 	// PA5
+#define MOSI GPIO7 	// PA7
+#define NSS	GPIO4 	// PA4
+// PORT A
+#define PORT_RST GPIOA
+#define RST	GPIO8 	// PA8
 
 
 // ******* Low_init *******

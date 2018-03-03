@@ -46,6 +46,7 @@ uint32_t Buffer_put( volatile void *in_buf,
 	*/
 	switch ( buffer->type )
 	{
+
 		case FIFO_U8T:
 			num_queued = buffer_fifo_u8_put( in_buf, buffer->is.fifo_u8, length );
 			return num_queued; // return number of data added to the buffer
@@ -73,22 +74,25 @@ uint32_t Buffer_get( volatile void *out_buf,
 {
 	uint32_t num_read;
 
-
 	/*
 	*  Call the specialized helper function corresponding to the supplied 
 	*  buffer parameters.
 	*/
 	switch ( buffer->type )
 	{
+		uint8_t s;
+		char test[20];
 		case FIFO_U8T:
 			num_read = buffer_fifo_u8_get( out_buf, buffer->is.fifo_u8, length );
-			//s = sprintf(test, "%ld", num_read);
-			//Uart_dmaTxHandler(test, s);
+
 			return num_read;
 			break;
 
 		case FIFO_U16T:
+
 			num_read = buffer_fifo_u16_get( out_buf, buffer->is.fifo_u16, length );
+			//s = sprintf(test, "%ld", num_read);
+			//Uart_send(test, s);
 			return num_read;
 			break;
 
@@ -196,7 +200,8 @@ uint32_t buffer_fifo_u16_put( volatile void *in_buf,
 {
 	cm_disable_interrupts();
 	uint32_t j;
-	uint32_t *nextPutPt = &b_u16t->putPt[1];
+	uint32_t *nextPutPt = (uint32_t*)&b_u16t->putPt;
+
 	volatile uint16_t *p;
 
 	p = in_buf;
@@ -209,7 +214,7 @@ uint32_t buffer_fifo_u16_put( volatile void *in_buf,
 		*  the getPt. First handle wrapping if we've reached the buffersize.
 		*/ 
 
-		if ( nextPutPt == (uint32_t*)&b_u16t->data[B_SIZE_FIFO_U8T] ) 
+		if ( nextPutPt == (uint32_t*)&b_u16t->data[B_SIZE_FIFO_U16T] ) 
 		{
 			nextPutPt = (uint32_t*)&b_u16t->data[0];
 		}
