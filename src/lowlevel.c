@@ -47,13 +47,16 @@ void gpio_init(void) {
 	gpio_set_output_options( PORT_SIG, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO_SIG2 );
 	gpio_set_output_options( PORT_SIG, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO_SIG3 );
 
-	// SPI peripheral pins
+	// SPI peripheral pins - Simplex transmission with NSS output
 	gpio_mode_setup( PORT_SPI, GPIO_MODE_AF, GPIO_PUPD_NONE, MOSI | SCK | NSS );
 	gpio_set_af( PORT_SPI, GPIO_AF0, MOSI | SCK | NSS );
 	gpio_set_output_options( PORT_SPI, GPIO_OTYPE_PP, GPIO_OSPEED_HIGH, MOSI | SCK | NSS );
+	// external pullup
+	gpio_set_output_options( PORT_SPI, GPIO_OTYPE_OD, GPIO_OSPEED_HIGH, NSS );
 
 	// Additional software controlled SPI pins
 	gpio_mode_setup( PORT_RST, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST );
-	gpio_set_output_options( PORT_RST, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, RST );
+	// external pullup
+	gpio_set_output_options( PORT_RST, GPIO_OTYPE_OD, GPIO_OSPEED_2MHZ, RST );
 }
 

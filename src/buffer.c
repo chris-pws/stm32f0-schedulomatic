@@ -80,8 +80,7 @@ uint32_t Buffer_get( volatile void *out_buf,
 	*/
 	switch ( buffer->type )
 	{
-		uint8_t s;
-		char test[20];
+
 		case FIFO_U8T:
 			num_read = buffer_fifo_u8_get( out_buf, buffer->is.fifo_u8, length );
 
@@ -91,8 +90,7 @@ uint32_t Buffer_get( volatile void *out_buf,
 		case FIFO_U16T:
 
 			num_read = buffer_fifo_u16_get( out_buf, buffer->is.fifo_u16, length );
-			//s = sprintf(test, "%ld", num_read);
-			//Uart_send(test, s);
+
 			return num_read;
 			break;
 

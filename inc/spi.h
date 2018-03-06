@@ -38,6 +38,15 @@ void Spi_dmaTxHandler( volatile void* data, uint8_t length );
 // Outputs: none
 void Spi_send( volatile void* data, uint32_t length );
 
+// ******* Spi_enableNssPulse *******
+// Enables SPI to generate an NSS pulse between two consecutive words while
+// performing consecutive transfers. The NSS is held high when transfers are
+// complete. Applies only to master mode, and has no effect when FRF or
+// CPHA control registers are 1.
+//  Inputs: SPI peripheral identifier
+// Outputs: none
+void Spi_enableNssPulse( uint32_t spi );
+
 // ******* Uart_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes

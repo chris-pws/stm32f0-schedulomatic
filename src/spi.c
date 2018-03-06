@@ -10,22 +10,21 @@ void Spi_init(void)
 	spi_reset(SPI1);
 
 	spi_i2s_mode_spi_mode(SPI1);
-
-	spi_init_master( SPI1, SPI_CR1_BR_FPCLK_DIV_256, 
-		SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_1, 
+	
+	spi_init_master( SPI1, SPI_CR1_BR_FPCLK_DIV_128, 
+		SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_1, 
 		SPI_CR1_CRCL_8BIT, SPI_CR1_MSBFIRST );
 
 	spi_set_data_size( SPI1, SPI_CR2_DS_9BIT );
 
-	spi_enable_ss_output(SPI1);
+	//spi_enable_ss_output(SPI1);
+	Spi_enableNssPulse(SPI1);
+	//spi_enable_software_slave_management(SPI1);
+	//spi_enable_tx_buffer_empty_interrupt(SPI1);
 	spi_set_bidirectional_transmit_only_mode(SPI1);
 
-	spi_set_next_tx_from_buffer(SPI1);
-
-	//Spi_csnHigh();
-	spi_enable(SPI1);
-
-
+	//spi_enable(SPI1);
+	
 
 }
 
@@ -43,9 +42,7 @@ void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 	{
 		// Wait until transaction is complete
 		Sched_flagWait(flagPt);
-		//Spi_begin();
-		//Spi_init();
-		//dma_spiTxInit();
+		
 		// Send data to the buffer handler function
 		buffer->is.fifo_u16->handler_function( &buf, len );
 
@@ -70,6 +67,8 @@ void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 	dma_enable_channel( DMA1, DMA_CHANNEL3 );
 	
 	spi_enable_tx_dma(SPI1);
+
+	spi_enable(SPI1);
 	
 }
 
@@ -81,4 +80,16 @@ void Spi_send( volatile void* data, uint32_t length )
 {
 	Buffer_put( data, &fifo_spiTx_param, length );
 
+}
+
+// ******* Spi_enableNssPulse *******
+// Enables SPI to generate an NSS pulse between two consecutive words while
+// performing consecutive transfers. The NSS is held high when transfers are
+// complete. Applies only to master mode, and has no effect when FRF or
+// CPHA control registers are 1.
+//  Inputs: SPI peripheral identifier
+// Outputs: none
+void Spi_enableNssPulse( uint32_t spi )
+{
+	SPI_CR2(spi) |= SPI_CR2_NSSP;
 }

@@ -26,13 +26,13 @@ int main(void)
 
 
 	while (1) {
-		for ( tester = 0; i < UINT16_MAX - 1; tester++ )
+		for ( tester = 511; tester > -1; tester-- )
 		{
-			Uart_send( " cockle ", 8 );
-			for ( i = 0; i < 10000; i++ );
+			Uart_send( " crunch ", 8 );
+			Systick_delayTicks(10);
 			Spi_send( &tester, 1 );
-			for ( i = 0; i < 10000; i++ );
-			//SPI1_DR = gob;
+			Systick_delayTicks(10);
+
 		}
 	}
 	return 0;
