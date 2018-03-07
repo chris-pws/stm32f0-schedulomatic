@@ -4,6 +4,7 @@
 #include "spi.h"
 #include "systick.h"
 #include "scheduler.h"
+#include "ssd1322_oled.h"
 #include <stdio.h>
 
 int main(void)
@@ -24,15 +25,13 @@ int main(void)
 	Sched_init();
 	Systick_init();
 
+	Oled_init();
 
 	while (1) {
 		for ( tester = 511; tester > -1; tester-- )
 		{
-			Uart_send( " crunch ", 8 );
-			Systick_delayTicks(10);
-			Spi_send( &tester, 1 );
-			Systick_delayTicks(10);
-
+			Uart_send( " crunch \n\r", 10 );
+			Systick_delayTicks(1000);
 		}
 	}
 	return 0;

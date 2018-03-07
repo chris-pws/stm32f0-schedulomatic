@@ -5,7 +5,7 @@
 #include <libopencm3/cm3/cortex.h>
 #include <libopencm3/stm32/gpio.h>
 
-#define B_SIZE_FIFO_U8T 1024
+#define B_SIZE_FIFO_U8T 1536
 #define B_SIZE_FIFO_U16T 1024
 
 struct buffer_fifo_u8

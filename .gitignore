@@ -32,3 +32,5 @@
 *.dSYM/
 
 build/
+
+src/ssd1322\.c

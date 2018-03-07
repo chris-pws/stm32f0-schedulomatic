@@ -97,15 +97,15 @@ void dma1_channel2_3_isr(void)
 	// Channel 3 is SPI1_TX
 	if ( isr & DMA_ISR_TCIF3 )
 	{
-		s = sprintf(test, "%lu", isr);
-		Uart_send(test, s);		
+		//s = sprintf(test, "%lu", isr);
+		//Uart_send(test, s);		
 		DMA1_IFCR |= DMA_IFCR_CGIF3;	/* Clear flags */
 
 		dma_disable_channel( DMA1, DMA_CHANNEL3 );
 		
 		/* Set SPI transmission interrupt (TXE) */
 		spi_enable_tx_buffer_empty_interrupt(SPI1);
-		Uart_send(" - dma. ", 8);
+		//Uart_send(" - dma. ", 8);
 
 		//gpio_toggle(GPIOB, GPIO3); 	/* LED2 on/off */
 
@@ -125,9 +125,9 @@ void spi1_isr(void)
 
 	if ( SPI_SR(SPI1) & SPI_SR_TXE )
 	{
-		s = sprintf(test, "%lu", SPI_SR(SPI1));
-		Uart_send(test, s);
-		Uart_send(" - spi. ", 8);
+		//s = sprintf(test, "%lu", SPI_SR(SPI1));
+		//Uart_send(test, s);
+		//Uart_send(" - spi. ", 8);
 		spi_disable_tx_buffer_empty_interrupt(SPI1);	
 		spi_disable(SPI1);
 		spi_disable_tx_dma(SPI1);
