@@ -26,6 +26,13 @@ uint32_t Systick_timeGetCount(void);
 // Outputs: The delta between two points in execution time.
 uint32_t Systick_timeDelta( uint32_t start, uint32_t end );
 
+// ******* Systick_delayTicks *******
+// Delays execution for x ticks based on time reporting from 
+// Systick_get_time(). Non-blocking.
+//  Inputs: Number of ticks to delay execution.
+// Outputs: none
+void Systick_delayTicks( uint32_t ticks );
+
 
 #define SYSTICK_H_ 1
 #endif

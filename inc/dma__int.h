@@ -1,6 +1,7 @@
 #ifndef DMA__INT_H_
 
 #include <stdint.h>
+#include <stdio.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/stm32/usart.h>

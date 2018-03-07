@@ -49,3 +49,23 @@ uint32_t Systick_timeDelta( uint32_t start, uint32_t end )
 
     return diff;
 }
+
+// ******* Systick_delayTicks *******
+// Delays execution for x ticks based on time reporting from 
+// Systick_get_time(). Scheduler event interrupt continues to fire.
+//  Inputs: Number of ticks to delay execution.
+// Outputs: none
+void Systick_delayTicks( uint32_t wait_ticks )
+{
+	uint32_t start, now, diff;
+
+	start = Systick_timeGetCount();
+
+	do
+	{
+		__asm__ __volatile__ ("nop");
+		now = Systick_timeGetCount();
+		diff = Systick_timeDelta( start, now );
+	}
+	while ( diff < wait_ticks );
+}

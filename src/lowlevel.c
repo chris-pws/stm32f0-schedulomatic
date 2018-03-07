@@ -18,7 +18,7 @@ void rcc_init(void) {
 	rcc_clock_setup_in_hsi_out_48mhz();
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
-	rcc_periph_clock_enable(RCC_AFIO);
+	rcc_periph_clock_enable(RCC_GPIOC);
 	rcc_periph_clock_enable(RCC_DMA);
 	rcc_periph_clock_enable(RCC_SPI1);
 	rcc_periph_clock_enable(RCC_USART2);
@@ -31,29 +31,32 @@ void rcc_init(void) {
 void gpio_init(void) {
 
 	// USART peripheral for serial debug via /tty/ACMx
-	gpio_mode_setup( GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2|GPIO3 );
-	gpio_set_af( GPIOA, GPIO_AF1, GPIO2|GPIO3 );
+	gpio_mode_setup( GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2 | GPIO3 );
+	gpio_set_af( GPIOA, GPIO_AF1, GPIO2 | GPIO3 );
 
 	// LED for debugging purposes
 	gpio_mode_setup( PORT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_LED );
 	// Lines for timing/debugging measurements
+	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG0 );
 	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG1 );
 	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG2 );
-	
-	// SPI software
-	/*
-	gpio_mode_setup( SPI_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST|CSN|SCK|MOSI );
-	gpio_set_output_options( SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, RST|CSN|SCK|MOSI );
-	gpio_mode_setup( SPI_PORT, GPIO_MODE_INPUT, GPIO_PUPD_NONE, MISO );
-	*/
+	gpio_mode_setup( PORT_SIG, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SIG3 );
 
-	// SPI peripheral pins
-	gpio_mode_setup( SPI_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, SCK|MOSI );
-	gpio_set_output_options( SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, SCK|MOSI )
-	gpio_set_af( SPI_PORT, GPIO_AF1, SCK|MOSI );
+	gpio_set_output_options( PORT_SIG, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO_SIG0 );
+	gpio_set_output_options( PORT_SIG, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO_SIG1 );
+	gpio_set_output_options( PORT_SIG, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO_SIG2 );
+	gpio_set_output_options( PORT_SIG, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO_SIG3 );
+
+	// SPI peripheral pins - Simplex transmission with NSS output
+	gpio_mode_setup( PORT_SPI, GPIO_MODE_AF, GPIO_PUPD_NONE, MOSI | SCK | NSS );
+	gpio_set_af( PORT_SPI, GPIO_AF0, MOSI | SCK | NSS );
+	gpio_set_output_options( PORT_SPI, GPIO_OTYPE_PP, GPIO_OSPEED_HIGH, MOSI | SCK | NSS );
+	// external pullup
+	gpio_set_output_options( PORT_SPI, GPIO_OTYPE_OD, GPIO_OSPEED_HIGH, NSS );
 
 	// Additional software controlled SPI pins
-	gpio_mode_setup( SPI_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST|CSN );
-	gpio_set_output_options( SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, RST|CSN );
+	gpio_mode_setup( PORT_RST, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST );
+	// external pullup
+	gpio_set_output_options( PORT_RST, GPIO_OTYPE_OD, GPIO_OSPEED_2MHZ, RST );
 }
 

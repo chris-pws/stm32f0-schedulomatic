@@ -7,12 +7,12 @@
 void Uart_init(void) 
 {
 
-	usart_set_baudrate(USART2, 38400);
-	usart_set_databits(USART2, 8);
-	usart_set_stopbits(USART2, USART_CR2_STOP_1_0BIT);
-	usart_set_mode(USART2, USART_MODE_TX);
-	usart_set_parity(USART2, USART_PARITY_NONE);
-	usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
+	usart_set_baudrate( USART2, 38400 );
+	usart_set_databits( USART2, 8 );
+	usart_set_stopbits( USART2, USART_CR2_STOP_1_0BIT );
+	usart_set_mode( USART2, USART_MODE_TX );
+	usart_set_parity( USART2, USART_PARITY_NONE );
+	usart_set_flow_control( USART2, USART_FLOWCONTROL_NONE );
 	usart_enable(USART2);
 
 }
@@ -48,13 +48,13 @@ void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 void Uart_dmaTxHandler( volatile void* data, uint8_t length ) 
 {
 
-	dma_disable_channel(DMA1, DMA_CHANNEL4);
+	dma_disable_channel( DMA1, DMA_CHANNEL4 );
 
-	dma_set_memory_address(DMA1, DMA_CHANNEL4, (uint32_t) data);
-	dma_set_number_of_data(DMA1, DMA_CHANNEL4, length);
+	dma_set_memory_address( DMA1, DMA_CHANNEL4, (uint32_t) data );
+	dma_set_number_of_data( DMA1, DMA_CHANNEL4, length );
 
-	dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL4);
-	dma_enable_channel(DMA1, DMA_CHANNEL4);
+	dma_enable_transfer_complete_interrupt( DMA1, DMA_CHANNEL4 );
+	dma_enable_channel( DMA1, DMA_CHANNEL4 );
 	usart_enable_tx_dma(USART2);
 
 }
