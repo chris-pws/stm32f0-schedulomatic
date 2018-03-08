@@ -7,7 +7,7 @@
 void Uart_init(void) 
 {
 
-	usart_set_baudrate( USART2, 38400 );
+	usart_set_baudrate( USART2, 115200 );
 	usart_set_databits( USART2, 8 );
 	usart_set_stopbits( USART2, USART_CR2_STOP_1_0BIT );
 	usart_set_mode( USART2, USART_MODE_TX );

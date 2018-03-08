@@ -12,7 +12,7 @@ int main(void)
 	volatile int i;
 	volatile uint32_t thetime;
 	volatile int s;
-	//uint8_t test[63][255];
+	uint8_t test[31][127];
 	volatile uint16_t tester;
 	uint16_t gob = 0x14D;
 
@@ -31,7 +31,7 @@ int main(void)
 		for ( tester = 511; tester > -1; tester-- )
 		{
 			Uart_send( " crunch \n\r", 10 );
-			Systick_delayTicks(1000);
+			Systick_delayTicks(100000);
 		}
 	}
 	return 0;

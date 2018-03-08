@@ -11,9 +11,10 @@ void Systick_init(void)
 	// 48MHz 
 	systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
 
-	// 48000000/100000 = 480 overflows per second - every 10 micros one interrupt
+	// 48000000/100000 = 480 overflows per second - every 10 microseconds equals
+	// one interrupt.
 	// SysTick interrupt every N clock pulses: set reload to N-1 
-	systick_set_reload(47999);
+	systick_set_reload(479);
 	systick_interrupt_enable();
 	// Start counting
 	systick_counter_enable();
@@ -44,7 +45,7 @@ uint32_t Systick_timeDelta( uint32_t start, uint32_t end )
     }
     else
     {
-        diff = UINT32_MAX - ( start-end ) + 1;
+        diff = UINT32_MAX - ( start - end ) + 1;
     }
 
     return diff;
