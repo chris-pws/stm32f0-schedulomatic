@@ -64,6 +64,13 @@ void Oled_on(void);
 */
 void Oled_off(void);
 
+/******** Oled_test *********
+* Test command sequence.
+*  Inputs: none
+* Outputs: none
+*/
+void Oled_test(void);
+
 // ******* Spi_send *******
 // Adds arbitrary number of elements to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, number of elements to copy

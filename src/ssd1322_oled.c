@@ -106,3 +106,41 @@ void Oled_off(void)
 
 	Spi_send( &cmd, 1 );
 }
+
+/******** Oled_test *********
+* Test command sequence.
+*  Inputs: none
+* Outputs: none
+*/
+void Oled_test(void)
+{
+	uint8_t x, y;
+
+	uint16_t clear_seq[] =
+	{
+		OLED_COL_START_END, 0x100, 0x100,
+		OLED_ROW_START_END, 0x100, 0x17F,
+		OLED_START_LINE, 0x100,
+		OLED_WRITE
+	};
+
+	uint16_t data_1 = 0x1F0;
+	uint16_t data_2 = 0x10F;
+
+	Spi_send( &clear_seq, (uint32_t)sizeof( clear_seq ) / sizeof(uint16_t) );
+
+	for ( y = 0; y < 32; y++ )
+	{
+		for ( x = 0; x < 128; x++ )
+		{
+			if ( ( x % 2 ) == 0 )
+			{
+				Spi_send( &data_1, 1 );
+			}
+			else
+			{
+				Spi_send( &data_2, 1 );
+			}
+		}
+	}
+}
