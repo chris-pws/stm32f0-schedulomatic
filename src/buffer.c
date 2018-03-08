@@ -12,16 +12,16 @@ void Buffer_init( buffer_param_t *buffer,
 	{
 		case FIFO_U8T:
 		{
-			buffer->is.fifo_u8->getPt = (uint32_t*)&buffer->is.fifo_u8->data[0];
-			buffer->is.fifo_u8->putPt = (uint32_t*)&buffer->is.fifo_u8->data[0];
+			buffer->is.fifo_u8->getPt = (uint8_t*)&buffer->is.fifo_u8->data[0];
+			buffer->is.fifo_u8->putPt = (uint8_t*)&buffer->is.fifo_u8->data[0];
 			buffer->is.fifo_u8->handler_function = handler;
 
 		}
 
 		case FIFO_U16T:
 		{
-			buffer->is.fifo_u16->getPt = (uint32_t*)&buffer->is.fifo_u16->data[0];
-			buffer->is.fifo_u16->putPt = (uint32_t*)&buffer->is.fifo_u16->data[0];
+			buffer->is.fifo_u16->getPt = (uint16_t*)&buffer->is.fifo_u16->data[0];
+			buffer->is.fifo_u16->putPt = (uint16_t*)&buffer->is.fifo_u16->data[0];
 			buffer->is.fifo_u16->handler_function = handler;
 
 		}
@@ -34,11 +34,11 @@ void Buffer_init( buffer_param_t *buffer,
 // buffer parameter structure provided.
 //  Inputs: pointer to data, pointer to a buffer_param_t, data length
 // Outputs: number of elements inserted successfully
-uint32_t Buffer_put( volatile void *in_buf, 
+uint16_t Buffer_put( volatile void *in_buf, 
 	buffer_param_t *buffer, 
-	uint32_t length )
+	uint16_t length )
 {
-	uint32_t num_queued;
+	uint16_t num_queued;
 
 	/*
 	*  Call the specialized helper function corresponding to the supplied 
@@ -68,11 +68,11 @@ uint32_t Buffer_put( volatile void *in_buf,
 //  Inputs: data pointer, buffer_param_t pointer, and number of elements to
 //          read.
 // Outputs: number of elements read into the data pointer.
-uint32_t Buffer_get( volatile void *out_buf, 
+uint16_t Buffer_get( volatile void *out_buf, 
 	buffer_param_t *buffer, 
-	uint32_t length )
+	uint16_t length )
 {
-	uint32_t num_read;
+	uint16_t num_read;
 
 	/*
 	*  Call the specialized helper function corresponding to the supplied 
@@ -102,13 +102,13 @@ uint32_t Buffer_get( volatile void *out_buf,
 // Private function that appends data to a supplied buffer.
 //  Inputs: pointer to data, pointer to a buffer_fifo_t, data length
 // Outputs: number of elements inserted successfully
-uint32_t buffer_fifo_u8_put( volatile void *in_buf, 
+uint16_t buffer_fifo_u8_put( volatile void *in_buf, 
 	struct buffer_fifo_u8 *b_u8t, 
-	uint32_t length )
+	uint16_t length )
 {
 	cm_disable_interrupts();
-	uint32_t j;
-	uint32_t *nextPutPt = &b_u8t->putPt[1];
+	uint16_t j;
+	uint8_t *nextPutPt;
 	volatile uint8_t *p;
 
 	p = in_buf;
@@ -116,31 +116,28 @@ uint32_t buffer_fifo_u8_put( volatile void *in_buf,
 	for ( j = 0; j < length; j++ )
 	{
 		/* Testing for buffer overflow
-		*  Check to see if there's space in the buffer. Full condition reached
-		*  if advancing the putPt to the next element in the buffer is met with
-		*  the getPt. First handle wrapping if we've reached the buffersize.
+		*  First handle wrapping if we've reached the buffersize. Check to see
+		*  if there's space in the queue: full condition reached when the
+		*  advancing putPt meets the getPt. 
 		*/ 
-		if ( nextPutPt == (uint32_t*)&b_u8t->data[B_SIZE_FIFO_U8T] ) 
-		{
-			nextPutPt = (uint32_t*)&b_u8t->data[0];
-		}
 
-		if ( nextPutPt == (uint32_t*)&b_u8t->getPt )
+		nextPutPt = (uint16_t*)( b_u8t->putPt + 1 );
+
+		if ( nextPutPt == (uint16_t*)&b_u8t->data[B_SIZE_FIFO_U8T] ) 
+		{
+			nextPutPt = (uint16_t*)&b_u8t->data[0];
+		}
+		
+		if ( nextPutPt == b_u8t->getPt )
 		{
 			cm_enable_interrupts();
+			Uart_send( " 8full ", 7 );
 			return j; // no vacancy, return number of elements fetched
 		}
 
 		(*b_u8t->putPt) = *p++;
-
-		// advance pointer address to next buffer element
-		b_u8t->putPt = (uint32_t*)&b_u8t->putPt[1]; 
-
-		// if we reach the buffer size, then wrap the putPt
-		if ( b_u8t->putPt == (uint32_t*)&b_u8t->data[B_SIZE_FIFO_U8T] )
-			{
-				b_u8t->putPt = (uint32_t*)&b_u8t->data[0];
-			}
+		// Set putPt address to the next element
+		b_u8t->putPt = nextPutPt;
 		
 	}
 	cm_enable_interrupts();
@@ -151,12 +148,12 @@ uint32_t buffer_fifo_u8_put( volatile void *in_buf,
 // Private function to retrieve and remove data from a specified buffer.
 //  Inputs: data pointer, buffer_fifo_t pointer, and number of elements to read
 // Outputs: number of elements read into the data pointer.
-uint32_t buffer_fifo_u8_get( volatile void *out_buf, 
+uint16_t buffer_fifo_u8_get( volatile void *out_buf, 
 	struct buffer_fifo_u8 *b_u8t, 
-	uint32_t length )
+	uint16_t length )
 {
 	cm_disable_interrupts();
-	uint32_t j;
+	uint16_t j;
 	volatile uint8_t *p;
 
 	p = out_buf;
@@ -168,12 +165,12 @@ uint32_t buffer_fifo_u8_get( volatile void *out_buf,
 		{
 			*p++ = (*b_u8t->getPt);
 
-			b_u8t->getPt = (uint32_t*)&b_u8t->getPt[1];
+			b_u8t->getPt = (uint8_t*)&b_u8t->getPt[1];
 
 			// Check for pointer wrap-around
-			if ( b_u8t->getPt == (uint32_t*)&b_u8t->data[B_SIZE_FIFO_U8T] )
+			if ( b_u8t->getPt == (uint8_t*)&b_u8t->data[B_SIZE_FIFO_U8T] )
 			{
-				b_u8t->getPt = (uint32_t*)&b_u8t->data[0];
+				b_u8t->getPt = (uint8_t*)&b_u8t->data[0];
 			}
 
 		}
@@ -192,13 +189,13 @@ uint32_t buffer_fifo_u8_get( volatile void *out_buf,
 // Private function that appends data to a supplied buffer.
 //  Inputs: pointer to data, pointer to a buffer_fifo_t, data length
 // Outputs: number of elements inserted successfully
-uint32_t buffer_fifo_u16_put( volatile void *in_buf, 
+uint16_t buffer_fifo_u16_put( volatile void *in_buf, 
 	struct buffer_fifo_u16 *b_u16t, 
-	uint32_t length )
+	uint16_t length )
 {
 	cm_disable_interrupts();
-	uint32_t j;
-	uint32_t *nextPutPt = (uint32_t*)&b_u16t->putPt;
+	uint16_t j;
+	uint16_t *nextPutPt;
 
 	volatile uint16_t *p;
 
@@ -207,47 +204,44 @@ uint32_t buffer_fifo_u16_put( volatile void *in_buf,
 	for ( j = 0; j < length; j++ )
 	{
 		/* Testing for buffer overflow
-		*  Check to see if there's space in the buffer. Full condition reached
-		*  if advancing the putPt to the next element in the buffer is met with
-		*  the getPt. First handle wrapping if we've reached the buffersize.
+		*  First handle wrapping if we've reached the buffersize. Check to see
+		*  if there's space in the queue: full condition reached when the
+		*  advancing putPt meets the getPt. 
 		*/ 
 
-		if ( nextPutPt == (uint32_t*)&b_u16t->data[B_SIZE_FIFO_U16T] ) 
-		{
-			nextPutPt = (uint32_t*)&b_u16t->data[0];
-		}
+		nextPutPt = (uint16_t*)( b_u16t->putPt + 1 );
 
-		if ( nextPutPt == (uint32_t*)&b_u16t->getPt )
+		if ( nextPutPt == (uint16_t*)&b_u16t->data[B_SIZE_FIFO_U16T] ) 
+		{
+			nextPutPt = (uint16_t*)&b_u16t->data[0];
+		}
+		
+		if ( nextPutPt == b_u16t->getPt )
 		{
 			cm_enable_interrupts();
+			Uart_send( " 16full ", 8 );
 			return j; // no vacancy, return number of elements fetched
 		}
 
 		(*b_u16t->putPt) = *p++;
-		// advance pointer address to next buffer element
-		b_u16t->putPt = (uint32_t*)&b_u16t->putPt[1]; 
-
-		// if we reach the buffer size, then wrap the putPt
-		if ( b_u16t->putPt == (uint32_t*)&b_u16t->data[B_SIZE_FIFO_U16T] )
-			{
-				b_u16t->putPt = (uint32_t*)&b_u16t->data[0];
-			}
+		// Set putPt address to the next element
+		b_u16t->putPt = nextPutPt;
 		
 	}
 	cm_enable_interrupts();
-	return j; // return number of data added to the buffer
+	return j; // return number of data added to the queue
 }
 
 // ******* buffer_fifo_u16_get *******
 // Private function to retrieve and remove data from a specified buffer.
 //  Inputs: data pointer, buffer_fifo_t pointer, and number of elements to read
 // Outputs: number of elements read into the data pointer.
-uint32_t buffer_fifo_u16_get( volatile void *out_buf, 
+uint16_t buffer_fifo_u16_get( volatile void *out_buf, 
 	struct buffer_fifo_u16 *b_u16t, 
-	uint32_t length )
+	uint16_t length )
 {
 	cm_disable_interrupts();
-	uint32_t j;
+	uint16_t j;
 	volatile uint16_t *p;
 
 	p = out_buf;
@@ -260,18 +254,19 @@ uint32_t buffer_fifo_u16_get( volatile void *out_buf,
 
 			*p++ = (*b_u16t->getPt);
 
-			b_u16t->getPt = (uint32_t*)&b_u16t->getPt[1];
+			b_u16t->getPt = (uint16_t*)&b_u16t->getPt[1];
 
 			// Check for pointer wrap-around
-			if ( b_u16t->getPt == (uint32_t*)&b_u16t->data[B_SIZE_FIFO_U16T] )
+			if ( b_u16t->getPt == (uint16_t*)&b_u16t->data[B_SIZE_FIFO_U16T] )
 			{
-				b_u16t->getPt = (uint32_t*)&b_u16t->data[0];
+				b_u16t->getPt = (uint16_t*)&b_u16t->data[0];
 			}
 
 		}
 		else
 		{
 			cm_enable_interrupts();
+
 			// Nothing left, return number of elements retrieved.
 			return j;
 		}

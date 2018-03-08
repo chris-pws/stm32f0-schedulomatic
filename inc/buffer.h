@@ -5,8 +5,8 @@
 #include <libopencm3/cm3/cortex.h>
 #include <libopencm3/stm32/gpio.h>
 
-#define B_SIZE_FIFO_U8T 1536
-#define B_SIZE_FIFO_U16T 1024
+#define B_SIZE_FIFO_U8T 512
+#define B_SIZE_FIFO_U16T 2048
 
 struct buffer_fifo_u8
 {
@@ -66,9 +66,9 @@ void Buffer_init( buffer_param_t *b_param,
 // buffer parameter structure provided.
 //  Inputs: pointer to data, pointer to a buffer_param_t, data length
 // Outputs: number of elements inserted successfully
-uint32_t Buffer_put( volatile void *in_buf, 
+uint16_t Buffer_put( volatile void *in_buf, 
 	buffer_param_t *b_param, 
-	uint32_t length );
+	uint16_t length );
 
 // ******* Buffer_get *******
 // Public function that retrieves and removes data from a buffer corresponding
@@ -76,47 +76,47 @@ uint32_t Buffer_put( volatile void *in_buf,
 //  Inputs: data pointer, buffer_param_t pointer, and number of elements to
 //          read.
 // Outputs: number of elements read into the data pointer.
-uint32_t Buffer_get( volatile void *out_buf, 
+uint16_t Buffer_get( volatile void *out_buf, 
 	buffer_param_t *b_param, 
-	uint32_t length );
+	uint16_t length );
 
 // ******* buffer_fifo_u8_put *******
 // Private function that appends data to a supplied buffer.
 //  Inputs: pointer to data, pointer to a buffer_fifo_t, data length
 // Outputs: number of elements inserted successfully
-uint32_t buffer_fifo_u8_put( volatile void *in_buf, 
+uint16_t buffer_fifo_u8_put( volatile void *in_buf, 
 	struct buffer_fifo_u8 *b_u8t, 
-	uint32_t length );
+	uint16_t length );
 
 // ******* buffer_fifo_u8_get *******
 // Private function to retrieve and remove data from a specified buffer.
 //  Inputs: data pointer, buffer_fifo_t pointer, and number of elements to read
 // Outputs: number of elements read into the data pointer.
-uint32_t buffer_fifo_u8_get( volatile void *out_buf, 
+uint16_t buffer_fifo_u8_get( volatile void *out_buf, 
 	struct buffer_fifo_u8 *b_u8t, 
-	uint32_t length );
+	uint16_t length );
 
 // ******* buffer_fifo_u16_put *******
 // Private function that appends data to a supplied buffer.
 //  Inputs: pointer to data, pointer to a buffer_fifo_t, data length
 // Outputs: number of elements inserted successfully
-uint32_t buffer_fifo_u16_put( volatile void *in_buf, 
+uint16_t buffer_fifo_u16_put( volatile void *in_buf, 
 	struct buffer_fifo_u16 *b_u16t, 
-	uint32_t length );
+	uint16_t length );
 
 // ******* buffer_fifo_u16_get *******
 // Private function to retrieve and remove data from a specified buffer.
 //  Inputs: data pointer, buffer_fifo_t pointer, and number of elements to read
 // Outputs: number of elements read into the data pointer.
-uint32_t buffer_fifo_u16_get( volatile void *out_buf, 
+uint16_t buffer_fifo_u16_get( volatile void *out_buf, 
 	struct buffer_fifo_u16 *b_u16t, 
-	uint32_t length );
+	uint16_t length );
 
 // ******* Buffer_Stat *******
 // Retrieves number of items currently stored in buffer (TO-DO).
 //  Inputs: buffer_param_t pointer
 // Outputs: number of elements contained in the buffer.
-uint32_t Buffer_stat( buffer_param_t *buffer );
+uint16_t Buffer_stat( buffer_param_t *buffer );
 
 // ******* Uart_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
