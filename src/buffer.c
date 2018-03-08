@@ -121,11 +121,11 @@ uint16_t buffer_fifo_u8_put( volatile void *in_buf,
 		*  advancing putPt meets the getPt. 
 		*/ 
 
-		nextPutPt = (uint16_t*)( b_u8t->putPt + 1 );
+		nextPutPt = (uint8_t*)( b_u8t->putPt + 1 );
 
-		if ( nextPutPt == (uint16_t*)&b_u8t->data[B_SIZE_FIFO_U8T] ) 
+		if ( nextPutPt == (uint8_t*)&b_u8t->data[B_SIZE_FIFO_U8T] ) 
 		{
-			nextPutPt = (uint16_t*)&b_u8t->data[0];
+			nextPutPt = (uint8_t*)&b_u8t->data[0];
 		}
 		
 		if ( nextPutPt == b_u8t->getPt )
