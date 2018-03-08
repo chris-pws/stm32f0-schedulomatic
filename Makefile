@@ -1,7 +1,7 @@
 #Project settings
 PROJECT_NAME = ssd1322_oled
 SOURCES = main.c lowlevel.c dma__int.c systick.c scheduler.c buffer.c uart.c
-SOURCES += spi.c
+SOURCES += spi.c ssd1322_oled.c
 BUILD_DIR = build/
 
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)%.o)
