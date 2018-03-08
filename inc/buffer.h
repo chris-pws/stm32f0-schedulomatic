@@ -11,8 +11,8 @@
 struct buffer_fifo_u8
 {
 	uint8_t data[B_SIZE_FIFO_U8T];
-	uint32_t *getPt; 
-	uint32_t *putPt;
+	uint8_t *getPt; 
+	uint8_t *putPt;
 	void (*handler_function)( volatile void *data, uint8_t length );
 	 
 };
@@ -20,8 +20,8 @@ struct buffer_fifo_u8
 struct buffer_fifo_u16
 {
 	uint16_t data[B_SIZE_FIFO_U16T];
-	uint32_t *getPt; 
-	uint32_t *putPt;
+	uint16_t *getPt; 
+	uint16_t *putPt;
 	void (*handler_function)( volatile void *data, uint8_t length );
 	 
 };
