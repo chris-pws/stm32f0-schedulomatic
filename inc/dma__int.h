@@ -52,17 +52,11 @@ extern void Sched_flagSignal( int32_t *semaPt );
 // Outputs: none
 extern void Sched_runEventManager(void);
 
-// ******* Spi_end *******
-// Called at the end of an SPI word transfer.
-//  Inputs: none
-// Outputs: none
-extern void Spi_end(void);
-
 // ******* Uart_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
-extern void Uart_send( volatile void* data, uint32_t length );
+extern void Uart_send( volatile void* data, uint16_t length );
 
 #define DMA__INT_H_ 1
 #endif

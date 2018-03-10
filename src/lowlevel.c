@@ -33,7 +33,7 @@ void gpio_init(void) {
 	// USART peripheral for serial debug via /tty/ACMx
 	gpio_mode_setup( GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2 | GPIO3 );
 	gpio_set_af( GPIOA, GPIO_AF1, GPIO2 | GPIO3 );
-	gpio_set_output_options( PORT_SPI, GPIO_OTYPE_PP, GPIO_OSPEED_HIGH, GPIO2 | GPIO3 );
+	//gpio_set_output_options( PORT_SPI, GPIO_OTYPE_PP, GPIO_OSPEED_HIGH, GPIO2 | GPIO3 );
 
 	// LED for debugging purposes
 	gpio_mode_setup( PORT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_LED );

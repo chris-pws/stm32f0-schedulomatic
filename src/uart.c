@@ -63,7 +63,7 @@ void Uart_dmaTxHandler( volatile void* data, uint8_t length )
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
-void Uart_send( volatile void* data, uint32_t length ) 
+void Uart_send( volatile void* data, uint16_t length ) 
 {
 
 	Buffer_put( data, &fifo_uartTx_param, length );

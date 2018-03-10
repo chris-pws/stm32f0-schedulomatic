@@ -131,7 +131,6 @@ uint16_t buffer_fifo_u8_put( volatile void *in_buf,
 		if ( nextPutPt == b_u8t->getPt )
 		{
 			cm_enable_interrupts();
-			Uart_send( " 8full ", 7 );
 			return j; // no vacancy, return number of elements fetched
 		}
 
@@ -219,7 +218,7 @@ uint16_t buffer_fifo_u16_put( volatile void *in_buf,
 		if ( nextPutPt == b_u16t->getPt )
 		{
 			cm_enable_interrupts();
-			Uart_send( " 16full ", 8 );
+			Uart_send( "x", 1 );
 			return j; // no vacancy, return number of elements fetched
 		}
 
@@ -266,7 +265,6 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 		else
 		{
 			cm_enable_interrupts();
-
 			// Nothing left, return number of elements retrieved.
 			return j;
 		}

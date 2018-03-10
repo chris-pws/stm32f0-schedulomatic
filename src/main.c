@@ -30,8 +30,10 @@ int main(void)
 	while (1) {
 		for ( tester = 511; tester > -1; tester-- )
 		{
-			Uart_send( " crunch \n\r", 10 );
-			Systick_delayTicks(100000);
+			Uart_send( " C ", 3 );
+			Systick_delayTicks(10000);
+			//Spi_send ( &tester, 1 );
+			Systick_delayTicks(1000);
 		}
 	}
 	return 0;

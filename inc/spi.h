@@ -36,7 +36,7 @@ void Spi_dmaTxHandler( volatile void* data, uint8_t length );
 // Adds arbitrary number of elements to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, number of elements to copy
 // Outputs: none
-void Spi_send( volatile void* data, uint32_t length );
+void Spi_send( volatile void* data, uint16_t length );
 
 // ******* Spi_enableNssPulse *******
 // Enables SPI to generate an NSS pulse between two consecutive words while
@@ -51,7 +51,7 @@ void Spi_enableNssPulse( uint32_t spi );
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
-extern void Uart_send( volatile void* data, uint32_t length );
+extern void Uart_send( volatile void* data, uint16_t length );
 
 #define SPI_H_ 1
 #endif

@@ -119,7 +119,7 @@ void dma1_channel2_3_isr(void)
 
 void spi1_isr(void)
 {
-	uint16_t isr = SPI1_SR;
+	// uint16_t isr = SPI1_SR;
 	uint8_t s;
 	char test[20];
 
