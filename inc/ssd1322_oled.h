@@ -6,10 +6,13 @@
 #include "systick.h"
 
 #define OLED_EN_GRAY 0x000
+#define OLED_DEFAULT_GRAYTABLE 0x0B9
 #define OLED_COL_START_END 0x015
 #define OLED_WRITE 0x05C
 #define OLED_ROW_START_END 0x075
+#define OLED_SET_REMAP 0x0A0
 #define OLED_START_LINE 0x0A1
+#define OLED_VERT_SCROLL 0x0A2
 #define OLED_ALL_OFF 0x0A4
 #define OLED_ALL_ON 0x0A5
 #define OLED_NORMAL 0x0A6
@@ -27,7 +30,10 @@
 #define OLED_CONTRAST_CURRENT 0x0C1
 #define OLED_MASTER_CONTRAST 0x0C7
 
-#define OLED_CMD_VDD_INIT 0x1A1
+#define OLED_LOCK_STATUS 0x0FD
+#define OLED_MUX_RATIO 0x0CA
+#define OLED_MAGIC_1 0x0B4
+#define OLED_MAGIC_2 0x0D1
 
 /******** Oled_init *********
 * Initializes the display controller.
@@ -64,6 +70,20 @@ void Oled_on(void);
 */
 void Oled_off(void);
 
+/******** Oled_invert *********
+* Inverts the current contents of the graphic display RAM.
+*  Inputs: none
+* Outputs: none
+*/
+void Oled_invert(void);
+
+/******** Oled_normal *********
+* Restores the display to normal mode.
+*  Inputs: none
+* Outputs: none
+*/
+void Oled_normal(void);
+
 /******** Oled_test *********
 * Test command sequence.
 *  Inputs: none
@@ -71,17 +91,31 @@ void Oled_off(void);
 */
 void Oled_test(void);
 
+/******** Oled_sendCmd *********
+* Sends a single byte command to the display controller.
+*  Inputs: a single command byte
+* Outputs: none
+*/
+void Oled_sendCmd( uint8_t cmd );
+
+/******** Oled_sendData *********
+* Sends a single byte of data to the display controller.
+*  Inputs: a single data byte
+* Outputs: none
+*/
+void Oled_sendData( uint8_t data );
+
 // ******* Spi_send *******
 // Adds arbitrary number of elements to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, number of elements to copy
 // Outputs: none
-extern void Spi_send( volatile void* data, uint32_t length );
+extern void Spi_send( volatile void* data, uint16_t length );
 
 // ******* Uart_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
-extern void Uart_send( volatile void* data, uint32_t length );
+extern void Uart_send( volatile void* data, uint16_t length );
 
 #define SSD1322_OLED_H_ 1
 #endif
