@@ -9,7 +9,7 @@ void Uart_init(void)
 
 	usart_set_baudrate( USART2, 115200 );
 	usart_set_databits( USART2, 8 );
-	usart_set_stopbits( USART2, USART_CR2_STOP_1_0BIT );
+	usart_set_stopbits( USART2, USART_CR2_STOPBITS_1 );
 	usart_set_mode( USART2, USART_MODE_TX );
 	usart_set_parity( USART2, USART_PARITY_NONE );
 	usart_set_flow_control( USART2, USART_FLOWCONTROL_NONE );
