@@ -11,14 +11,17 @@ void Spi_init(void)
 
 	spi_i2s_mode_spi_mode(SPI1);
 	
-	spi_init_master( SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_128, 
+	// Baudrate ( 48000000 / 16 ) 6 MHz
+	spi_init_master( SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_16, 
 		SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_1, 
 		SPI_CR1_CRCL_8BIT, SPI_CR1_MSBFIRST );
 
 	spi_set_data_size( SPI1, SPI_CR2_DS_9BIT );
 
-	spi_enable_ss_output(SPI1);
-	//Spi_enableNssPulse(SPI1);
+	//spi_set_baudrate_prescaler( SPI1, SPI_CR1_BR_FPCLK_DIV_64 );
+
+	//spi_enable_ss_output(SPI1);
+	Spi_enableNssPulse(SPI1);
 	//spi_enable_software_slave_management(SPI1);
 	//spi_enable_tx_buffer_empty_interrupt(SPI1);
 	spi_set_bidirectional_transmit_only_mode(SPI1);
