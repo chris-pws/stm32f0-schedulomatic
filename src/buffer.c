@@ -3,9 +3,10 @@
 // ******* Buffer_Init *******
 // Initializes a buffer parameter structure, preparing it for usage.
 // Inputs: Pointer to buffer_param_t.
-//		   Function pointer called by the event scheduler to handle queue processing.
+//		   Function pointer called by the event scheduler to handle queue 
+//		   processing.
 // Ouputs: None
-void Buffer_init( buffer_param_t *buffer, 
+void Buffer_init( buffer_param_t *buffer, int32_t *flagSize
 	void(*handler)( volatile void *data, uint8_t length ) )
 {
 	switch ( buffer->type )
@@ -137,6 +138,7 @@ uint16_t buffer_fifo_u8_put( volatile void *in_buf,
 		(*b_u8t->putPt) = *p++;
 		// Set putPt address to the next element
 		b_u8t->putPt = nextPutPt;
+		Sched_flagSignal( b_u8t->flagSize );
 		
 	}
 	cm_enable_interrupts();
@@ -165,6 +167,7 @@ uint16_t buffer_fifo_u8_get( volatile void *out_buf,
 			*p++ = (*b_u8t->getPt);
 
 			b_u8t->getPt = (uint8_t*)&b_u8t->getPt[1];
+			Sched_flagWait( b_u8t->flagSize );
 
 			// Check for pointer wrap-around
 			if ( b_u8t->getPt == (uint8_t*)&b_u8t->data[B_SIZE_FIFO_U8T] )
@@ -225,6 +228,7 @@ uint16_t buffer_fifo_u16_put( volatile void *in_buf,
 		(*b_u16t->putPt) = *p++;
 		// Set putPt address to the next element
 		b_u16t->putPt = nextPutPt;
+		Sched_flagSignal( b_u16t->flagSize );
 		
 	}
 	cm_enable_interrupts();
@@ -254,6 +258,7 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 			*p++ = (*b_u16t->getPt);
 
 			b_u16t->getPt = (uint16_t*)&b_u16t->getPt[1];
+			Sched_flagWait( b_u16t->flagSize );
 
 			// Check for pointer wrap-around
 			if ( b_u16t->getPt == (uint16_t*)&b_u16t->data[B_SIZE_FIFO_U16T] )
@@ -266,9 +271,32 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 		{
 			cm_enable_interrupts();
 			// Nothing left, return number of elements retrieved.
+			//Uart_send( "j", 1 );
 			return j;
 		}
 	}
 	cm_enable_interrupts();
 	return j;
+}
+
+// ******* Buffer_flagSizeAdd *******
+// Decrement semaphore, blocking task if less than zero
+//  Inputs: pointer to a flag, number of elements to add
+// Outputs: none
+void Buffer_flagSizeAdd( int32_t *flagPt, uint16_t num_elements )
+{
+
+
+
+}
+
+// ******* Buffer_flagSizeSub *******
+// Subtract  buffer size flag
+//  Inputs: pointer to a flag, number of elements to substract
+// Outputs: none
+void Buffer_flagSizeSub( int32_t *flagPt, uint16_t num_elements )
+{
+
+
+
 }

@@ -42,6 +42,8 @@ struct buffer_param
 		struct buffer_fifo_u8 *fifo_u8;
 		struct buffer_fifo_u16 *fifo_u16;
 	} is;
+
+	int32_t *flagSize;
 };
 
 typedef struct buffer_param buffer_param_t;
@@ -112,17 +114,25 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 	struct buffer_fifo_u16 *b_u16t, 
 	uint16_t length );
 
-// ******* Buffer_Stat *******
-// Retrieves number of items currently stored in buffer (TO-DO).
-//  Inputs: buffer_param_t pointer
-// Outputs: number of elements contained in the buffer.
-uint16_t Buffer_stat( buffer_param_t *buffer );
+// ******* Buffer_flagSizeAdd *******
+// Decrement semaphore, blocking task if less than zero
+//  Inputs: pointer to a flag, number of elements to add
+// Outputs: none
+void Buffer_flagSizeAdd( int32_t *flagPt, uint16_t num_elements );
+
+// ******* Buffer_flagSizeSub *******
+// Subtract  buffer size flag
+//  Inputs: pointer to a flag, number of elements to substract
+// Outputs: none
+void Buffer_flagSizeSub( int32_t *flagPt, uint16_t num_elements );
 
 // ******* Uart_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
 extern void Uart_send( volatile void* data, uint16_t length );
+
+
 
 #define BUFFER_H_ 1
 #endif
