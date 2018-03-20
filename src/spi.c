@@ -11,8 +11,8 @@ void Spi_init(void)
 
 	spi_i2s_mode_spi_mode(SPI1);
 	
-	// Baudrate ( 48000000 / 16 ) 6 MHz
-	spi_init_master( SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_16, 
+	// Baudrate ( 48000000 / 2 ) 24 MHz
+	spi_init_master( SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_2, 
 		SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_1, 
 		SPI_CR1_CRCL_8BIT, SPI_CR1_MSBFIRST );
 
@@ -48,6 +48,8 @@ void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 		
 		// Send data to the buffer handler function
 		buffer->is.fifo_u16->handler_function( &buf, len );
+
+		gpio_toggle(GPIOC, GPIO0);
 
 	}
 

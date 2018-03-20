@@ -75,11 +75,11 @@ void dma_spiTxInit(void) {
 	dma_set_peripheral_address( DMA1, DMA_CHANNEL3, (uint32_t) &SPI1_DR );
 	dma_set_read_from_memory( DMA1, DMA_CHANNEL3 );
 	dma_enable_memory_increment_mode( DMA1, DMA_CHANNEL3 );
-	dma_enable_peripheral_increment_mode(DMA1, DMA_CHANNEL3);
+	dma_disable_peripheral_increment_mode(DMA1, DMA_CHANNEL3);
 	//copying 9 bit words
 	dma_set_peripheral_size( DMA1, DMA_CHANNEL3, DMA_CCR_PSIZE_16BIT );
 	dma_set_memory_size( DMA1, DMA_CHANNEL3, DMA_CCR_MSIZE_16BIT );
-	dma_set_priority( DMA1, DMA_CHANNEL3, DMA_CCR_PL_HIGH );
+	dma_set_priority( DMA1, DMA_CHANNEL3, DMA_CCR_PL_VERY_HIGH );
 }
 
 // ******* dma1_channel2_3_isr *******
@@ -91,22 +91,16 @@ void dma1_channel2_3_isr(void)
 {
 
 	uint32_t isr = DMA1_ISR;
-	uint8_t s;
-	char test[20];
-
 	// Channel 3 is SPI1_TX
 	if ( isr & DMA_ISR_TCIF3 )
 	{
-		//s = sprintf(test, "%lu", isr);
-		//Uart_send(test, s);		
+		
 		DMA1_IFCR |= DMA_IFCR_CGIF3;	/* Clear flags */
 
 		dma_disable_channel( DMA1, DMA_CHANNEL3 );
 		
 		/* Set SPI transmission interrupt (TXE) */
 		spi_enable_tx_buffer_empty_interrupt(SPI1);
-		//Uart_send(" - dma. ", 8);
-
 		//gpio_toggle(GPIOB, GPIO3); 	/* LED2 on/off */
 
 	}
@@ -120,17 +114,20 @@ void dma1_channel2_3_isr(void)
 void spi1_isr(void)
 {
 	// uint16_t isr = SPI1_SR;
-	uint8_t s;
-	char test[20];
+	//uint8_t s;
+	//char test[20];
 
 	if ( SPI_SR(SPI1) & SPI_SR_TXE )
 	{
-		//s = sprintf(test, "%lu", SPI_SR(SPI1));
-		//Uart_send(test, s);
-		//Uart_send(" - spi. ", 8);
+		//s = sprintf( test, "%lu", SPI_SR(SPI1) );
+		//Uart_send( test, s );
+		//Uart_send( " - spi. ", 8 );
 		spi_disable_tx_buffer_empty_interrupt(SPI1);	
 		spi_disable(SPI1);
 		spi_disable_tx_dma(SPI1);
+
+		gpio_toggle(GPIOC, GPIO0);
+
 		Sched_flagSignal( &Flag_DMA_Chan3 );
 	}
 
