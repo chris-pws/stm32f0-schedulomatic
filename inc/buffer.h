@@ -60,7 +60,7 @@ buffer_param_t *Buffer_paramInit( enum buffer_format b_format );
 // Inputs: Pointer to buffer_fifo_t.
 //		   Function pointer called by the event scheduler to handle queue processing.
 // Ouputs: None
-void Buffer_init( buffer_param_t *b_param, 
+void Buffer_init( buffer_param_t *buffer, int32_t *flagSize,
 	void(*handler)( volatile void *data, uint8_t length ) );
 
 // ******* Buffer_put *******
@@ -114,15 +114,21 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 	struct buffer_fifo_u16 *b_u16t, 
 	uint16_t length );
 
+// ******* Buffer_flagSizeInit *******
+// Initialize a buffer size counting flag
+//  Inputs: pointer to a buffer size flag
+// Outputs: none
+void Buffer_flagSizeInit( int32_t *flagPt );
+
 // ******* Buffer_flagSizeAdd *******
 // Decrement semaphore, blocking task if less than zero
-//  Inputs: pointer to a flag, number of elements to add
+//  Inputs: pointer to a buffer size flag, number of elements to add
 // Outputs: none
 void Buffer_flagSizeAdd( int32_t *flagPt, uint16_t num_elements );
 
 // ******* Buffer_flagSizeSub *******
 // Subtract  buffer size flag
-//  Inputs: pointer to a flag, number of elements to substract
+//  Inputs: pointer to a buffer size flag, number of elements to substract
 // Outputs: none
 void Buffer_flagSizeSub( int32_t *flagPt, uint16_t num_elements );
 

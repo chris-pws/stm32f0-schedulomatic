@@ -9,8 +9,12 @@ int32_t Flag_DMA_Chan3;
 int32_t Flag_DMA_Chan4;
 int32_t Flag_test;
 
+int32_t Flag_bufferSize_uart;
+int32_t Flag_bufferSize_spi;
+
 struct buffer_fifo_u8 fifo_uartTx[1];
 struct buffer_fifo_u16 fifo_spiTx[1];
+struct buffer_fifo_u8 fifo_test[1];
 
 buffer_param_t fifo_uartTx_param = 
     { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_uartTx } };
@@ -18,22 +22,38 @@ buffer_param_t fifo_uartTx_param =
 buffer_param_t fifo_spiTx_param = 
     { .type = FIFO_U16T, .is= { .fifo_u16 = fifo_spiTx } };
 
-// ******* Sched_Init *******
-// Initializes system task scheduler.
+buffer_param_t fifo_test_param = 
+    { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_test } };
+
+/* ******* Sched_Init *******
+*  Initializes system task scheduler.
+*/
 void Sched_init(void) {
 
 	Sched_flagInit( &Flag_DMA_Chan4, 1 ); // flag for UART_tx DMA
 	Sched_flagInit( &Flag_DMA_Chan3, 1 ); // flag for SPI_tx DMA
 	Sched_flagInit( &Flag_test, 1 ); // test flag for test event
 
-	Buffer_init( &fifo_uartTx_param, &Uart_dmaTxHandler );
-	Buffer_init( &fifo_spiTx_param, &Spi_dmaTxHandler );
+	/* Initialize buffer size signals */ 
+	Buffer_flagSizeInit( &Flag_bufferSize_uart );
+	Buffer_flagSizeInit( &Flag_bufferSize_spi );
 
-	/* pointer to process, time interval, a data queue parameter, a signal flag
+	Buffer_init( &fifo_uartTx_param, &Flag_bufferSize_uart, 
+				&Uart_dmaTxHandler );
+	Buffer_init( &fifo_spiTx_param, &Flag_bufferSize_spi, 
+				&Spi_dmaTxHandler );
+	Buffer_init( &fifo_test_param, &Flag_test, 
+				&test_handler );
+
+
+	/* pointer to process, fixed time interval, a data queue parameter, 
+	*  and a signal flag.
 	*/ 
-	Sched_addEvent( &Uart_fifoTxEvent, 10, &fifo_uartTx_param, &Flag_DMA_Chan4 );
-	Sched_addEvent( &Spi_fifoTxEvent, 5, &fifo_spiTx_param, &Flag_DMA_Chan3 );
-	Sched_addEvent( &test_event, 10000, &fifo_uartTx_param, &Flag_test );
+	//Sched_addEvent( &Uart_fifoTxEvent, 1000, &fifo_uartTx_param, 
+	//			&Flag_DMA_Chan4 );
+	Sched_addEvent( &Spi_fifoTxEvent, 1, &fifo_spiTx_param, 
+				&Flag_DMA_Chan3 );
+	//Sched_addEvent( &test_event, 10000, &fifo_test_param, &Flag_test );
 
 }
 
@@ -114,9 +134,10 @@ void Sched_runEventManager(void)
 		diff = Systick_timeDelta( events[j].last, now );
 
 		/* if: reception conditions are true (at or past interval delta, 
-		   task flag > 0), run event
+		   task flag > 0, buffer size > 0), run event
 		*/
-		if ( ( diff >= events[j].interval ) && ( (*events[j].flag) ) )  
+		if ( ( diff >= events[j].interval ) && ( (*events[j].flag) ) 
+				&& ( (*events[j].buffer->flagSize) ) )  
 		{
 			events[j].eventFunction( events[j].buffer, events[j].flag );
 			events[j].last = now;
@@ -131,4 +152,9 @@ void Sched_runEventManager(void)
 void test_event( buffer_param_t *buffer, int32_t *flagPt )
 {
 	gpio_toggle(GPIOB, GPIO8);
+}
+
+void test_handler( volatile void* data, uint8_t length )
+{
+	return;
 }

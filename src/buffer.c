@@ -6,7 +6,7 @@
 //		   Function pointer called by the event scheduler to handle queue 
 //		   processing.
 // Ouputs: None
-void Buffer_init( buffer_param_t *buffer, int32_t *flagSize
+void Buffer_init( buffer_param_t *buffer, int32_t *flagSize,
 	void(*handler)( volatile void *data, uint8_t length ) )
 {
 	switch ( buffer->type )
@@ -16,6 +16,7 @@ void Buffer_init( buffer_param_t *buffer, int32_t *flagSize
 			buffer->is.fifo_u8->getPt = (uint8_t*)&buffer->is.fifo_u8->data[0];
 			buffer->is.fifo_u8->putPt = (uint8_t*)&buffer->is.fifo_u8->data[0];
 			buffer->is.fifo_u8->handler_function = handler;
+			buffer->flagSize = flagSize;
 
 		}
 
@@ -24,6 +25,7 @@ void Buffer_init( buffer_param_t *buffer, int32_t *flagSize
 			buffer->is.fifo_u16->getPt = (uint16_t*)&buffer->is.fifo_u16->data[0];
 			buffer->is.fifo_u16->putPt = (uint16_t*)&buffer->is.fifo_u16->data[0];
 			buffer->is.fifo_u16->handler_function = handler;
+			buffer->flagSize = flagSize;
 
 		}
 	}
@@ -41,6 +43,7 @@ uint16_t Buffer_put( volatile void *in_buf,
 {
 	uint16_t num_queued;
 
+	cm_disable_interrupts();
 	/*
 	*  Call the specialized helper function corresponding to the supplied 
 	*  buffer parameters.
@@ -50,16 +53,21 @@ uint16_t Buffer_put( volatile void *in_buf,
 
 		case FIFO_U8T:
 			num_queued = buffer_fifo_u8_put( in_buf, buffer->is.fifo_u8, length );
+			Buffer_flagSizeAdd( buffer->flagSize, num_queued );
+			cm_enable_interrupts();
 			return num_queued; // return number of data added to the buffer
 			break;
 
 
 		case FIFO_U16T:
 			num_queued = buffer_fifo_u16_put( in_buf, buffer->is.fifo_u16, length );
+			Buffer_flagSizeAdd( buffer->flagSize, num_queued );
+			cm_enable_interrupts();
 			return num_queued; // return number of data added to the buffer
 			break;
 	}
 
+	cm_enable_interrupts();
 	return 0;
 }
 
@@ -75,6 +83,7 @@ uint16_t Buffer_get( volatile void *out_buf,
 {
 	uint16_t num_read;
 
+	cm_disable_interrupts();
 	/*
 	*  Call the specialized helper function corresponding to the supplied 
 	*  buffer parameters.
@@ -84,18 +93,22 @@ uint16_t Buffer_get( volatile void *out_buf,
 
 		case FIFO_U8T:
 			num_read = buffer_fifo_u8_get( out_buf, buffer->is.fifo_u8, length );
-
+			Buffer_flagSizeSub( buffer->flagSize, num_read );
+			cm_enable_interrupts();
 			return num_read;
 			break;
 
 		case FIFO_U16T:
 
 			num_read = buffer_fifo_u16_get( out_buf, buffer->is.fifo_u16, length );
-
+			Buffer_flagSizeSub( buffer->flagSize, num_read );
+			cm_enable_interrupts();
 			return num_read;
 			break;
 
 	}
+
+	cm_enable_interrupts();
 	return 0;
 }
 
@@ -107,7 +120,7 @@ uint16_t buffer_fifo_u8_put( volatile void *in_buf,
 	struct buffer_fifo_u8 *b_u8t, 
 	uint16_t length )
 {
-	cm_disable_interrupts();
+
 	uint16_t j;
 	uint8_t *nextPutPt;
 	volatile uint8_t *p;
@@ -131,17 +144,15 @@ uint16_t buffer_fifo_u8_put( volatile void *in_buf,
 		
 		if ( nextPutPt == b_u8t->getPt )
 		{
-			cm_enable_interrupts();
+
 			return j; // no vacancy, return number of elements fetched
 		}
 
 		(*b_u8t->putPt) = *p++;
 		// Set putPt address to the next element
 		b_u8t->putPt = nextPutPt;
-		Sched_flagSignal( b_u8t->flagSize );
 		
 	}
-	cm_enable_interrupts();
 	return j; // return number of data added to the buffer
 }
 
@@ -153,7 +164,7 @@ uint16_t buffer_fifo_u8_get( volatile void *out_buf,
 	struct buffer_fifo_u8 *b_u8t, 
 	uint16_t length )
 {
-	cm_disable_interrupts();
+
 	uint16_t j;
 	volatile uint8_t *p;
 
@@ -167,7 +178,6 @@ uint16_t buffer_fifo_u8_get( volatile void *out_buf,
 			*p++ = (*b_u8t->getPt);
 
 			b_u8t->getPt = (uint8_t*)&b_u8t->getPt[1];
-			Sched_flagWait( b_u8t->flagSize );
 
 			// Check for pointer wrap-around
 			if ( b_u8t->getPt == (uint8_t*)&b_u8t->data[B_SIZE_FIFO_U8T] )
@@ -178,12 +188,12 @@ uint16_t buffer_fifo_u8_get( volatile void *out_buf,
 		}
 		else
 		{
-			cm_enable_interrupts();
+
 			// Nothing left, return number of elements retrieved.
 			return j;
 		}
 	}
-	cm_enable_interrupts();
+
 	return j;
 }
 
@@ -195,7 +205,7 @@ uint16_t buffer_fifo_u16_put( volatile void *in_buf,
 	struct buffer_fifo_u16 *b_u16t, 
 	uint16_t length )
 {
-	cm_disable_interrupts();
+
 	uint16_t j;
 	uint16_t *nextPutPt;
 
@@ -220,7 +230,7 @@ uint16_t buffer_fifo_u16_put( volatile void *in_buf,
 		
 		if ( nextPutPt == b_u16t->getPt )
 		{
-			cm_enable_interrupts();
+
 			Uart_send( "x", 1 );
 			return j; // no vacancy, return number of elements fetched
 		}
@@ -228,10 +238,9 @@ uint16_t buffer_fifo_u16_put( volatile void *in_buf,
 		(*b_u16t->putPt) = *p++;
 		// Set putPt address to the next element
 		b_u16t->putPt = nextPutPt;
-		Sched_flagSignal( b_u16t->flagSize );
 		
 	}
-	cm_enable_interrupts();
+
 	return j; // return number of data added to the queue
 }
 
@@ -243,7 +252,7 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 	struct buffer_fifo_u16 *b_u16t, 
 	uint16_t length )
 {
-	cm_disable_interrupts();
+
 	uint16_t j;
 	volatile uint16_t *p;
 
@@ -258,7 +267,6 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 			*p++ = (*b_u16t->getPt);
 
 			b_u16t->getPt = (uint16_t*)&b_u16t->getPt[1];
-			Sched_flagWait( b_u16t->flagSize );
 
 			// Check for pointer wrap-around
 			if ( b_u16t->getPt == (uint16_t*)&b_u16t->data[B_SIZE_FIFO_U16T] )
@@ -269,15 +277,26 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 		}
 		else
 		{
-			cm_enable_interrupts();
 			// Nothing left, return number of elements retrieved.
-			//Uart_send( "j", 1 );
+			Uart_send( "j", 1 );
 			return j;
 		}
 	}
-	cm_enable_interrupts();
+
 	return j;
 }
+
+// ******* Buffer_flagSizeInit *******
+// Initialize a buffer size counting flag
+//  Inputs: pointer to a buffer size flag
+// Outputs: none
+void Buffer_flagSizeInit( int32_t *flagPt )
+{
+
+	(*flagPt) = 0;
+
+}
+
 
 // ******* Buffer_flagSizeAdd *******
 // Decrement semaphore, blocking task if less than zero
@@ -286,7 +305,7 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 void Buffer_flagSizeAdd( int32_t *flagPt, uint16_t num_elements )
 {
 
-
+	(*flagPt) += num_elements;
 
 }
 
@@ -297,6 +316,11 @@ void Buffer_flagSizeAdd( int32_t *flagPt, uint16_t num_elements )
 void Buffer_flagSizeSub( int32_t *flagPt, uint16_t num_elements )
 {
 
+	(*flagPt) -= num_elements;
 
+	if ( (*flagPt) < 0 )
+	{
+		(*flagPt) = 0;
+	}
 
 }
