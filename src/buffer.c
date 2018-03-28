@@ -6,15 +6,18 @@
 //		   Function pointer called by the event scheduler to handle queue 
 //		   processing.
 // Ouputs: None
-void Buffer_init( buffer_param_t *buffer, int32_t *flagSize,
+void Buffer_init( buffer_param_t *buffer, uint16_t size, 
+	volatile uint8_t *data, int32_t *flagSize, 
 	void(*handler)( volatile void *data, uint8_t length ) )
 {
 	switch ( buffer->type )
 	{
 		case FIFO_U8T:
 		{
-			buffer->is.fifo_u8->getPt = (uint8_t*)&buffer->is.fifo_u8->data[0];
-			buffer->is.fifo_u8->putPt = (uint8_t*)&buffer->is.fifo_u8->data[0];
+			buffer->is.fifo_u8->data = data;
+			buffer->is.fifo_u8->getIndex = 0;
+			buffer->is.fifo_u8->putIndex = 0;
+			buffer->is.fifo_u8->size = size;
 			buffer->is.fifo_u8->handler_function = handler;
 			buffer->flagSize = flagSize;
 
@@ -62,6 +65,7 @@ uint16_t Buffer_put( volatile void *in_buf,
 		case FIFO_U16T:
 			num_queued = buffer_fifo_u16_put( in_buf, buffer->is.fifo_u16, length );
 			Buffer_flagSizeAdd( buffer->flagSize, num_queued );
+			//Test_in( &a_test_table, num_queued );
 			cm_enable_interrupts();
 			return num_queued; // return number of data added to the buffer
 			break;
@@ -102,6 +106,7 @@ uint16_t Buffer_get( volatile void *out_buf,
 
 			num_read = buffer_fifo_u16_get( out_buf, buffer->is.fifo_u16, length );
 			Buffer_flagSizeSub( buffer->flagSize, num_read );
+			//Test_out( &a_test_table, num_read );
 			cm_enable_interrupts();
 			return num_read;
 			break;
@@ -122,7 +127,7 @@ uint16_t buffer_fifo_u8_put( volatile void *in_buf,
 {
 
 	uint16_t j;
-	uint8_t *nextPutPt;
+	uint16_t nextPutIndex;
 	volatile uint8_t *p;
 
 	p = in_buf;
@@ -130,27 +135,27 @@ uint16_t buffer_fifo_u8_put( volatile void *in_buf,
 	for ( j = 0; j < length; j++ )
 	{
 		/* Testing for buffer overflow
-		*  First handle wrapping if we've reached the buffersize. Check to see
+		*  First handle wrapping if we've reached the buffer size. Check to see
 		*  if there's space in the queue: full condition reached when the
-		*  advancing putPt meets the getPt. 
+		*  advancing putIndex meets the getIndex. We avoid corrupting the queue
+		*  by writing to its index variables only after this test passes.
 		*/ 
 
-		nextPutPt = (uint8_t*)( b_u8t->putPt + 1 );
+		nextPutIndex = b_u8t->putIndex + 1;
 
-		if ( nextPutPt == (uint8_t*)&b_u8t->data[B_SIZE_FIFO_U8T] ) 
+		if ( nextPutIndex == ( b_u8t->size - 1 ) )
 		{
-			nextPutPt = (uint8_t*)&b_u8t->data[0];
+			nextPutIndex = 0;
 		}
 		
-		if ( nextPutPt == b_u8t->getPt )
+		if ( nextPutIndex == b_u8t->getIndex )
 		{
-
 			return j; // no vacancy, return number of elements fetched
 		}
 
-		(*b_u8t->putPt) = *p++;
-		// Set putPt address to the next element
-		b_u8t->putPt = nextPutPt;
+		b_u8t->data[b_u8t->putIndex] = *p++;
+		// Set putIndex to the next element
+		b_u8t->putIndex = nextPutIndex;
 		
 	}
 	return j; // return number of data added to the buffer
@@ -170,19 +175,19 @@ uint16_t buffer_fifo_u8_get( volatile void *out_buf,
 
 	p = out_buf;
 
-	for ( j = 0; j < length; j++ ) {
-		
-		// Check for get & put pointer collision
-		if ( b_u8t->getPt != b_u8t->putPt )
+	for ( j = 0; j < length; j++ ) 
+	{	
+		// Check for get & put index collision
+		if ( b_u8t->getIndex != b_u8t->putIndex )
 		{
-			*p++ = (*b_u8t->getPt);
+			*p++ = b_u8t->data[b_u8t->getIndex];
 
-			b_u8t->getPt = (uint8_t*)&b_u8t->getPt[1];
+			b_u8t->getIndex += 1;
 
-			// Check for pointer wrap-around
-			if ( b_u8t->getPt == (uint8_t*)&b_u8t->data[B_SIZE_FIFO_U8T] )
+			// Check for index wrap-around
+			if ( b_u8t->getIndex == ( b_u8t->size - 1 ) )
 			{
-				b_u8t->getPt = (uint8_t*)&b_u8t->data[0];
+				b_u8t->getIndex = 0;
 			}
 
 		}
@@ -258,8 +263,8 @@ uint16_t buffer_fifo_u16_get( volatile void *out_buf,
 
 	p = out_buf;
 
-	for ( j = 0; j < length; j++ ) {
-		
+	for ( j = 0; j < length; j++ ) 
+	{	
 		// Check for get & put pointer collision
 		if ( b_u16t->getPt != b_u16t->putPt )
 		{

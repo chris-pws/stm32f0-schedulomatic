@@ -101,5 +101,7 @@ extern void Spi_dmaTxHandler( volatile void* data, uint8_t length );
 
 void test_event( buffer_param_t *buffer, int32_t *flagPt );
 
+void test_handler( volatile void* data, uint8_t length );
+
 #define SCHEDULER_H_ 1
 #endif

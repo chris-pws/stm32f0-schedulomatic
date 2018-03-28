@@ -5,14 +5,18 @@
 #include <libopencm3/cm3/cortex.h>
 #include <libopencm3/stm32/gpio.h>
 
+//#include "test.h"
+
 #define B_SIZE_FIFO_U8T 512
 #define B_SIZE_FIFO_U16T 2048
+#define B_SIZE_TEST 8
 
 struct buffer_fifo_u8
 {
-	uint8_t data[B_SIZE_FIFO_U8T];
-	uint8_t *getPt; 
-	uint8_t *putPt;
+	uint8_t *data;
+	uint16_t getIndex; 
+	uint16_t putIndex;
+	uint16_t size;
 	void (*handler_function)( volatile void *data, uint8_t length );
 	 
 };
@@ -58,9 +62,11 @@ buffer_param_t *Buffer_paramInit( enum buffer_format b_format );
 // ******* Buffer_init *******
 // Initializes a FIFO queue structure, preparing it for usage.
 // Inputs: Pointer to buffer_fifo_t.
-//		   Function pointer called by the event scheduler to handle queue processing.
+//		   Function pointer called by the event scheduler to handle queue 
+//		   processing.
 // Ouputs: None
-void Buffer_init( buffer_param_t *buffer, int32_t *flagSize,
+void Buffer_init( buffer_param_t *buffer, uint16_t size, 
+	volatile uint8_t *data, int32_t *flagSize, 
 	void(*handler)( volatile void *data, uint8_t length ) );
 
 // ******* Buffer_put *******

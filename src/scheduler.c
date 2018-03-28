@@ -25,35 +25,52 @@ buffer_param_t fifo_spiTx_param =
 buffer_param_t fifo_test_param = 
     { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_test } };
 
+volatile uint8_t fifo_uartTxData[B_SIZE_FIFO_U8T];
+volatile uint16_t fifo_spiTxData[B_SIZE_FIFO_U16T];
+volatile uint8_t fifo_testData[B_SIZE_TEST];
+
 /* ******* Sched_Init *******
-*  Initializes system task scheduler.
+*  Initializes system task fixed rate scheduler.
 */
 void Sched_init(void) {
-
+	/* Initialize task target blocking signals */ 
 	Sched_flagInit( &Flag_DMA_Chan4, 1 ); // flag for UART_tx DMA
 	Sched_flagInit( &Flag_DMA_Chan3, 1 ); // flag for SPI_tx DMA
-	Sched_flagInit( &Flag_test, 1 ); // test flag for test event
+	Sched_flagInit( &Flag_test, 1 ); // test flag for test target
 
-	/* Initialize buffer size signals */ 
+	/* Initialize blocking signal reflecting number of elements stored */ 
 	Buffer_flagSizeInit( &Flag_bufferSize_uart );
 	Buffer_flagSizeInit( &Flag_bufferSize_spi );
 
-	Buffer_init( &fifo_uartTx_param, &Flag_bufferSize_uart, 
-				&Uart_dmaTxHandler );
-	Buffer_init( &fifo_spiTx_param, &Flag_bufferSize_spi, 
-				&Spi_dmaTxHandler );
-	Buffer_init( &fifo_test_param, &Flag_test, 
+	/* Initialize buffer size setting */ 
+	const uint16_t sizeUart = B_SIZE_FIFO_U8T;
+	const uint16_t sizeSpi = B_SIZE_FIFO_U16T;
+	const uint16_t sizeTest = B_SIZE_TEST;
+
+	/* Initialize buffer_param objects providing: pointer to buffer_param_t, 
+	*  number of elements, pointer to data array, blocking stored elements
+	*  flag, and address of a target callback handler function.
+	*/
+	Buffer_init( &fifo_uartTx_param, sizeUart, &fifo_uartTxData, 
+				&Flag_bufferSize_uart, &Uart_dmaTxHandler );
+
+	Buffer_init( &fifo_spiTx_param, sizeSpi, &fifo_spiTxData, 
+				&Flag_bufferSize_spi, &Spi_dmaTxHandler );
+
+	Buffer_init( &fifo_test_param, sizeTest, fifo_testData, &Flag_test,
 				&test_handler );
 
+	/* Add events to the task mananger by providing: pointer to event function,
+	*  fixed time interval, a queue parameter object, and a target signal flag.
+	*/
 
-	/* pointer to process, fixed time interval, a data queue parameter, 
-	*  and a signal flag.
-	*/ 
-	//Sched_addEvent( &Uart_fifoTxEvent, 1000, &fifo_uartTx_param, 
-	//			&Flag_DMA_Chan4 );
+	Sched_addEvent( &Uart_fifoTxEvent, 1, &fifo_uartTx_param, 
+				&Flag_DMA_Chan4 );
+
 	Sched_addEvent( &Spi_fifoTxEvent, 1, &fifo_spiTx_param, 
 				&Flag_DMA_Chan3 );
-	//Sched_addEvent( &test_event, 10000, &fifo_test_param, &Flag_test );
+
+	Sched_addEvent( &test_event, 1000, &fifo_test_param, &Flag_test );
 
 }
 
@@ -95,9 +112,7 @@ void Sched_flagSignal( int32_t *flagPt )
 // Outputs: none
 void Sched_addEvent( 
 	void(*function)( buffer_param_t *buffer, int32_t *flagPt ),
-	uint32_t period_cycles, 
-	buffer_param_t *buffer, 
-	int32_t *flagPt )
+	uint32_t period_cycles, buffer_param_t *buffer, int32_t *flagPt )
 {
 	int j;
 	for ( j = 0; j < NUMEVENTS; j++ )
