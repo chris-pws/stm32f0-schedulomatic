@@ -1,6 +1,6 @@
 #include "systick.h"
 
-uint32_t systickCount = UINT32_MAX - 5000;
+volatile uint32_t systickCount = UINT32_MAX - 5000;
 
 // ******* Systick_init *******
 // Initializes the SysTick interrupt timer.
@@ -14,7 +14,7 @@ void Systick_init(void)
 	// 48000000/100000 = 480 overflows per second - every 10 microseconds equals
 	// one interrupt.
 	// SysTick interrupt every N clock pulses: set reload to N-1 
-	systick_set_reload(479);
+	systick_set_reload(47999);
 	systick_interrupt_enable();
 	// Start counting
 	systick_counter_enable();
@@ -58,7 +58,7 @@ uint32_t Systick_timeDelta( uint32_t start, uint32_t end )
 // Outputs: none
 void Systick_delayTicks( uint32_t wait_ticks )
 {
-	uint32_t start, now, diff;
+	volatile uint32_t start, now, diff;
 
 	start = Systick_timeGetCount();
 
@@ -66,7 +66,8 @@ void Systick_delayTicks( uint32_t wait_ticks )
 	{
 		__asm__ __volatile__ ("nop");
 		now = Systick_timeGetCount();
-		diff = Systick_timeDelta( start, now );
+		
+        diff = Systick_timeDelta( start, now );
 	}
 	while ( diff < wait_ticks );
 }
