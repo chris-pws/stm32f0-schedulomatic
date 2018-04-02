@@ -7,7 +7,7 @@
 */
 void Oled_sendCmd( uint8_t cmd )
 {
-	uint16_t cmd_shift = cmd >> 1;
+	//uint16_t cmd_shift = cmd >> 1;
 	uint16_t cmd_out[] =
 	{
 		cmd
@@ -39,8 +39,6 @@ void Oled_sendData( uint8_t data )
 */
 void Oled_init(void)
 {
-	uint8_t s;
-	char test[20];
 
 	uint16_t init_seq[] = 
 	{
@@ -212,7 +210,7 @@ void Oled_test(void)
 	};
 
 	uint16_t data_1[] = { 0x112,0x134,0x156,0x178,0x19A,0x1BC,0x1DE,0x1F0 };
-	uint16_t data_2 = 0x16D;
+	//uint16_t data_2 = 0x16D;
 	uint16_t data_t[128];
 	for ( x = 0; x < 128; x++ )
 	{
