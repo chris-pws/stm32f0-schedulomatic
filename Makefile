@@ -2,6 +2,7 @@
 PROJECT_NAME = ssd1322_oled
 SOURCES = main.c lowlevel.c dma__int.c systick.c scheduler.c buffer.c uart.c
 SOURCES += spi.c ssd1322_oled.c
+SOURCES += test.c
 BUILD_DIR = build/
 
 OBJECTS = $(SOURCES:%.c=$(BUILD_DIR)%.o)
@@ -94,7 +95,7 @@ all: default
 
 upload: $(TARGET_HEX)
 
-	openocd -f /home/cms/openocd/tcl/interface/stlink-v2.cfg \
+	openocd -f /home/cms/openocd/tcl/interface/stlink-v2-1.cfg \
 		    -f /home/cms/openocd/tcl/target/stm32f0x.cfg \
 		    -c "init" -c "reset init" \
 		    -c "flash write_image erase $(TARGET_HEX)" \

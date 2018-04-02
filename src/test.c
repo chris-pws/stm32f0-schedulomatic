@@ -1,19 +1,19 @@
 #include "test.h"
 
-struct a_test_table test_table[NUM_TESTS];
+volatile test_table_t a_test_table;
 
 /******** Test_init *********
 * Initializes a test table.
 *  Inputs: A test_table struct
 * Outputs: none
 */
-void Test_init( struct test_table t )
+void Test_init( volatile test_table_t *t )
 {
 
-	t.start = 0;
-	t.end = 0;
-	t.in = 0;
-	t.out = 0;
+	t->start = 0;
+	t->end = 0;
+	t->in = 0;
+	t->out = 0;
 }
 
 /******** Test_start *********
@@ -21,11 +21,11 @@ void Test_init( struct test_table t )
 *  Inputs: A test_table struct
 * Outputs: none
 */
-void Test_start( struct test_table t )
+void Test_start( volatile test_table_t *t )
 {
 
-	now = Systick_timeGetCount();
-	t.start = now;
+	uint32_t now = Systick_timeGetCount();
+	t->start = now;
 
 }
 
@@ -34,35 +34,35 @@ void Test_start( struct test_table t )
 *  Inputs: A test_table struct
 * Outputs: none
 */
-void Test_end( struct test_table t )
+void Test_end( volatile test_table_t *t )
 {
 
-	now = Systick_timeGetCount();
-	t.end = now;
+	uint32_t now = Systick_timeGetCount();
+	t->end = now;
 
 }
 
 /******** Test_in *********
-* Records an inputted value to a test table.
+* Records x elements queued to a test table.
 *  Inputs: A test_table struct, uint32_t in value
 * Outputs: none
 */
-void Test_in( struct test_table t, uint32_t in )
+void Test_in( volatile test_table_t *t, uint32_t in )
 {
 
-	t.start = in;
+	t->in += in;
 
 }
 
 /******** Test_out *********
-* Records an outputted value to a test table.
+* Records x outbound queued elements to a test table.
 *  Inputs: A test_table struct, uint32_t out value
 * Outputs: none
 */
-void Test_out( struct test_table t, uint32_t out )
+void Test_out( volatile test_table_t *t, uint32_t out )
 {
 
-	t.start = out;
+	t->out += out;
 
 }
 
@@ -72,9 +72,20 @@ void Test_out( struct test_table t, uint32_t out )
 *  Inputs: A test_table struct
 * Outputs: none
 */
-void Test_calculate( struct test_table t )
+void Test_calculate( volatile test_table_t *t )
 {
+	char out_time_buf[120];
+	char out_element_buf[120];
+	uint32_t s;
 
-	int64_t in_out_diff = t.in - t.out;
-	uint32_t start_end_diff = Systick_timeDelta( t.start, t.end );
+	int64_t in_out_diff = t->in - t->out;
+	uint32_t start_end_diff = Systick_timeDelta( t->start, t->end );
+
+	s = sprintf( out_time_buf, " Start: %lu End: %lu Duration: %lu ", t->start, t->end,
+				 start_end_diff );
+	Uart_send( out_time_buf, s );
+
+	s = sprintf( out_element_buf, " In: %lu Out: %lu Difference: %lli ", t->in, t->out,
+				 in_out_diff );
+	Uart_send( out_element_buf, s );
 }
