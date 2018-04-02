@@ -26,7 +26,7 @@ buffer_param_t fifo_test_param =
     { .type = FIFO_U8T, .is= { .fifo_u8 = fifo_test } };
 
 volatile uint8_t fifo_uartTxData[B_SIZE_FIFO_U8T];
-volatile uint16_t fifo_spiTxData[B_SIZE_FIFO_U16T];
+volatile uint8_t fifo_spiTxData[B_SIZE_FIFO_U16T];
 volatile uint8_t fifo_testData[B_SIZE_TEST];
 
 /* ******* Sched_Init *******
@@ -51,10 +51,10 @@ void Sched_init(void) {
 	*  number of elements, pointer to data array, blocking stored elements
 	*  flag, and address of a target callback handler function.
 	*/
-	Buffer_init( &fifo_uartTx_param, sizeUart, &fifo_uartTxData, 
+	Buffer_init( &fifo_uartTx_param, sizeUart, fifo_uartTxData, 
 				&Flag_bufferSize_uart, &Uart_dmaTxHandler );
 
-	Buffer_init( &fifo_spiTx_param, sizeSpi, &fifo_spiTxData, 
+	Buffer_init( &fifo_spiTx_param, sizeSpi, fifo_spiTxData, 
 				&Flag_bufferSize_spi, &Spi_dmaTxHandler );
 
 	Buffer_init( &fifo_test_param, sizeTest, fifo_testData, &Flag_test,
@@ -64,13 +64,13 @@ void Sched_init(void) {
 	*  fixed time interval, a queue parameter object, and a target signal flag.
 	*/
 
-	Sched_addEvent( &Uart_fifoTxEvent, 1, &fifo_uartTx_param, 
+	Sched_addEvent( &Uart_fifoTxEvent, 25, &fifo_uartTx_param, 
 				&Flag_DMA_Chan4 );
-
+	/*
 	Sched_addEvent( &Spi_fifoTxEvent, 1, &fifo_spiTx_param, 
 				&Flag_DMA_Chan3 );
-
-	Sched_addEvent( &test_event, 1000, &fifo_test_param, &Flag_test );
+	*/
+	Sched_addEvent( &test_event, 10000, &fifo_test_param, &Flag_test );
 
 }
 

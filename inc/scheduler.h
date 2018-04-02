@@ -8,7 +8,7 @@
 #include "systick.h"
 #include "buffer.h"
 
-#define NUMEVENTS 3
+#define NUMEVENTS 2
 
 // Signaling flags
 extern int32_t Flag_DMA_Chan3;

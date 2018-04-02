@@ -5,15 +5,15 @@
 #include <libopencm3/cm3/cortex.h>
 #include <libopencm3/stm32/gpio.h>
 
-//#include "test.h"
+#include "test.h"
 
-#define B_SIZE_FIFO_U8T 512
+#define B_SIZE_FIFO_U8T 128
 #define B_SIZE_FIFO_U16T 2048
 #define B_SIZE_TEST 8
 
 struct buffer_fifo_u8
 {
-	uint8_t *data;
+	volatile uint8_t *data;
 	uint16_t getIndex; 
 	uint16_t putIndex;
 	uint16_t size;

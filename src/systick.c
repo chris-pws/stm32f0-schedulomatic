@@ -14,7 +14,7 @@ void Systick_init(void)
 	// 48000000/100000 = 480 overflows per second - every 10 microseconds equals
 	// one interrupt.
 	// SysTick interrupt every N clock pulses: set reload to N-1 
-	systick_set_reload(47999);
+	systick_set_reload(479);
 	systick_interrupt_enable();
 	// Start counting
 	systick_counter_enable();
