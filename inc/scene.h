@@ -18,7 +18,15 @@ struct scene_backgnd
 	enum scene_tiling;
 };
 
-
+struct scene_obj
+{
+	uint16_t x;
+	uint16_t y;
+	sprite_obj_t *sprite;
+	scene_obj_t *next;
+	//additional attributes
+	
+}
 
 #define SCENE_H_ 1
 #endif

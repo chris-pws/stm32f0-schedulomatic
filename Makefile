@@ -1,7 +1,7 @@
 #Project settings
 PROJECT_NAME = ssd1322_oled
 SOURCES = main.c lowlevel.c dma__int.c systick.c scheduler.c buffer.c uart.c
-SOURCES += spi.c ssd1322_oled.c
+SOURCES += spi.c ssd1322_oled.c frame.c
 SOURCES += test.c
 BUILD_DIR = build/
 

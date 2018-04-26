@@ -7,9 +7,9 @@ struct sprite_obj
 	uint16_t width;
 	uint16_t height;
 
-	static const *bmp_data;
+	static const uint8_t *bmp_data;
 	uint16_t length;
-	
+
 }
 
 #define SPRITE_H_ 1

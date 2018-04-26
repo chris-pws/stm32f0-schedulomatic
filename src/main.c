@@ -6,7 +6,9 @@
 #include "spi.h"
 #include "systick.h"
 #include "scheduler.h"
+
 #include "ssd1322_oled.h"
+#include "frame.h"
 
 #include <libopencm3/stm32/f0/rcc.h>
 #include <stdio.h>
@@ -23,6 +25,11 @@ int main(void)
 	uint16_t gob = 0x14D;
 	*/
 
+	volatile uint8_t frame_buffer[16];
+	frame_buffer_t fb;
+	volatile int32_t fb_flag;
+	frame_bufferInit( &fb, 4, 16, (uint8_t *) &frame_buffer, &fb_flag );
+
 	Low_init();
 	Dma_init();
 
@@ -37,7 +44,7 @@ int main(void)
 
 	//Oled_init();
 
-	Test_start( &a_test_table );
+	
 	//Test_init( &a_test_table );
 	
 	//Oled_test();	
@@ -45,12 +52,13 @@ int main(void)
 	
 	//s = sprintf( test, " %lu ", RCC_CFGR );
 	//Uart_send( test, s );
+
 	while (1) {
-		
+		Test_start( &a_test_table );
 		for ( tester = 0; tester < 5; tester++ )
 		{
 			Systick_delayTicks(10000);
-			//Uart_send( " Pretty cats leave hair everywhere ", 35 );
+			Uart_send( "\n", 1 );
 			//gpio_toggle(GPIOB, GPIO8);
 			//Systick_delayTicks(1);
 			
