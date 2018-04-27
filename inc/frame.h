@@ -16,6 +16,7 @@ struct frame_buffer
 	volatile uint8_t *data;
 	int width;
 	int h_width;
+	int height;
 	int length;
 	volatile int32_t *readyFlag;
 };
@@ -24,12 +25,12 @@ typedef struct frame_buffer frame_buffer_t;
 
 /******** frame_bufferInit *********
 * Initializes a frame_buffer_t object.
-*  Inputs: pointer to a frame_buffer_t, width, length, pointer to an allocated
-*  data array.
+*  Inputs: pointer to a frame_buffer_t, width in pixels, height in pixels, 
+*  pointer to an allocated data array, length of array in bytes.
 * Outputs: none
 */
-void frame_bufferInit( frame_buffer_t *f, int width, int length, 
-					volatile uint8_t *data, volatile int32_t *flag );
+void frame_bufferInit( frame_buffer_t *f, int width, int height, 
+	volatile uint8_t *data, int length, volatile int32_t *flag );
 
 /******** frame_pixelSet *********
 * Sets an arbitary pixel to greyLvl reflecting the x,y coordinates provided.

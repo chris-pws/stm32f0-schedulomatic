@@ -12,60 +12,63 @@
 
 #include <libopencm3/stm32/f0/rcc.h>
 #include <stdio.h>
+#include <stddef.h>
 
 int main(void)
 {
 	
-	volatile uint16_t tester;
-	/*
-	volatile uint32_t thetime;
-	uint8_t s;
+	size_t s;
 	char test[64];
 	volatile int i;
-	uint16_t gob = 0x14D;
-	*/
+	int x,y,prev_x,prev_y = 0;
 
 	volatile uint8_t frame_buffer[16];
-	frame_buffer_t fb;
+	frame_buffer_t fb_t;
 	volatile int32_t fb_flag;
-	frame_bufferInit( &fb, 4, 16, (uint8_t *) &frame_buffer, &fb_flag );
+	frame_bufferInit( &fb_t, 4, 16, 4, (uint8_t *) &frame_buffer, &fb_flag );
 
 	Low_init();
 	Dma_init();
 
 	Test_init( &a_test_table );
 	
-
 	Uart_init();
 	Spi_init();
 	
 	Sched_init();
 	Systick_init();
-
-	//Oled_init();
-
-	
-	//Test_init( &a_test_table );
-	
-	//Oled_test();	
 	
 	
 	//s = sprintf( test, " %lu ", RCC_CFGR );
 	//Uart_send( test, s );
 
 	while (1) {
+
 		Test_start( &a_test_table );
-		for ( tester = 0; tester < 5; tester++ )
+		Uart_send( "\n", 1 );
+		for ( i = 0; i < 16; i++ )
 		{
-			Systick_delayTicks(10000);
-			Uart_send( "\n", 1 );
-			//gpio_toggle(GPIOB, GPIO8);
-			//Systick_delayTicks(1);
-			
+			s = sprintf( test, " %x ", frame_buffer[i] );
+			Uart_send( test, s );
+			Uart_send( " ", 1 );
 		}
-		//Uart_send( " meow ", 6 );
-		Test_end( &a_test_table );
-		Test_calculate( &a_test_table );
+		Uart_send( "\n\n", 2 );
+		// set current pixel to F
+		//buffer_pixelSet( &fb_t,  )
+		// set last pixel to 0
+		//buffer_pixelSet( &fb_t,  )
+		// increment column
+		x += 1;
+		if ( x == 8 ) // reached end of column, increment line and reset column
+		{
+			x = 0;
+			y += 1;
+		}
+		if ( y = 4 ) // reached last line, return to first line
+		{
+			y = 0;
+		}
+
 		Systick_delayTicks(50000);
 		
 	}
