@@ -25,7 +25,7 @@ int main(void)
 	volatile uint8_t frame_buffer[16];
 	frame_buffer_t fb_t;
 	volatile int32_t fb_flag;
-	frame_bufferInit( &fb_t, 4, 16, 4, (uint8_t *) &frame_buffer, &fb_flag );
+	frame_bufferInit( &fb_t, 8, 16, 4, (uint8_t *) &frame_buffer, &fb_flag );
 
 	Low_init();
 	Dma_init();
@@ -53,6 +53,16 @@ int main(void)
 			Uart_send( " ", 1 );
 		}
 		Uart_send( "\n\n", 2 );
+
+		prev_x = x - 1;
+		if ( prev_x < 0 )
+		{
+			prev_x = 7;
+			prev_y = y - 1;
+			if ( prev_y < 0 ) prev_y = 3;
+		}
+		
+
 		// set current pixel to F
 		//buffer_pixelSet( &fb_t,  )
 		// set last pixel to 0
