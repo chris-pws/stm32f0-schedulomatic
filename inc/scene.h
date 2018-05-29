@@ -12,13 +12,13 @@ enum scene_tiling
 
 struct scene_backgnd
 {
-	static const sprite_obj_t;
+	sprite_obj_t *sprite;
 	uint16_t x;
 	uint16_t y;
 	enum scene_tiling;
 };
 
-struct scene_obj
+struct scene_obj_list
 {
 	uint16_t x;
 	uint16_t y;

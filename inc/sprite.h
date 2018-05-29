@@ -12,5 +12,7 @@ struct sprite_obj
 
 }
 
+typedef struct sprite_obj sprite_obj_t;
+
 #define SPRITE_H_ 1
 #endif

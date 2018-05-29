@@ -22,9 +22,6 @@ void frame_bufferInit( frame_buffer_t *f, int width, int height,
 *  Inputs: pointer to a frame_buffer_t, x coordinate, y coordinate, grey value
 *  from 0 (black) to F (white).
 * Outputs: none
-*
-* frame_buffer_t:
-*	member h_width is expected to be ceiling half the width
 */
 void frame_pixelSet( frame_buffer_t *f, int x, int y, int value ) 
 {
