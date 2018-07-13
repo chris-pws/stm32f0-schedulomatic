@@ -13,18 +13,32 @@
 #define GPIO_SIG2 GPIO2
 #define GPIO_SIG3 GPIO3
 
-// PORT A
+// SPI - PORT A
 #define PORT_SPI GPIOA
-#define SCK	GPIO5 	// PA5
-#define MOSI GPIO7 	// PA7
-#define NSS	GPIO4 	// PA4
-// PORT A
-#define PORT_RST GPIOA
-#define RST	GPIO8 	// PA8
+#define SCK	GPIO5 	      // PA5
+#define MOSI GPIO7 	      // PA7
+#define NSS	GPIO4 	      // PA4
+// LED - PORT A
+#define PORT_OLED GPIOA
+#define RST	GPIO8 	      // PA8
+#define DC GPIO9          // PA9
 
+// Buttons - PORT B
+#define PORT_BTN GPIOB
+#define BTN_LEFT GPIO3 	  // PB3
+#define BTN_RIGHT GPIO5   // PB5
+
+// Joystick Left - PORT A
+#define JOY_PORT_LEFT GPIOA
+#define JOY_X_LEFT GPIO0  // PA0
+#define JOY_Y_LEFT GPIO1  // PA1
+// Joystick Right - PORT C
+#define JOY_PORT_RIGHT GPIOC
+#define JOY_X_RIGHT GPIO1 // PC1
+#define JOY_Y_LEFT GPIO0  // PC0
 
 // ******* Low_init *******
-// Enables low-level initialization of clocks, pins, and peripherals.
+// Attends to initialization of clocks, pins, and peripherals.
 //  Inputs: none
 // Outputs: none
 void Low_init(void);
