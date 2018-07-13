@@ -21,6 +21,7 @@
 struct Queue
 {
 	queue_data *my;
+
 	void (*putFunction)( volatile void *in_buf, Queue_t *me, int length );
 	void (*getFunction)( volatile void *out_buf, Queue_t *me, int length );
 
@@ -71,15 +72,17 @@ typedef struct Queue Queue_t;
 /********* Queue_init *******
 * Initializes a FIFO queue structure, preparing it for usage.
 * Inputs: Pointer to Queue_t, number of elements as size, queue_data pointer,
-*         Pointer to a putFunction and a getFunction,
-*		  Function pointer called by the event scheduler to handle queue
+*         pointer to a constructor function,
+*         pointer to a putFunction and a getFunction,
+*		  function pointer called by the event scheduler to handle queue
 *		  processing.
 * Ouputs: None
 */
 void Queue_init( Queue_t *me, int size, struct queue_data *my, 
 	int *flagSize, 
-	void(*putFunction)( Queue_t *me ), 
-	void(*getFunction)( Queue_t *me ),
+	void(*initFunction)( Queue_t *me ),
+	void(*putFunction)( Queue_t *me, volatile void *in_buf, int length ), 
+	void(*getFunction)( Queue_t *me, volatile void *out_buf, int length ),
 	void(*handler)( volatile void *data, int length ) );
 
 /********* Queue_put *******
