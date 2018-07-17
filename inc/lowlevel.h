@@ -18,7 +18,7 @@
 #define SCK	GPIO5 	      // PA5
 #define MOSI GPIO7 	      // PA7
 #define NSS	GPIO4 	      // PA4
-// LED - PORT A
+// OLED - PORT A
 #define PORT_OLED GPIOA
 #define RST	GPIO8 	      // PA8
 #define DC GPIO9          // PA9
@@ -35,7 +35,7 @@
 // Joystick Right - PORT C
 #define JOY_PORT_RIGHT GPIOC
 #define JOY_X_RIGHT GPIO1 // PC1
-#define JOY_Y_LEFT GPIO0  // PC0
+#define JOY_Y_RIGHT GPIO0  // PC0
 
 // ******* Low_init *******
 // Attends to initialization of clocks, pins, and peripherals.

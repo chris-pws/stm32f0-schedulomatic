@@ -36,3 +36,13 @@ build/
 src/ssd1322\.c
 
 core
+
+stm32f030f4\.ld
+
+*.bak
+
+stm32f031f4\.ld
+
+stm32f031k6\.ld
+
+inc/buffer\.h

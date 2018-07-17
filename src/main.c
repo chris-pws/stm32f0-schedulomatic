@@ -21,16 +21,16 @@ int main(void)
 	char test[64];
 	volatile int i;
 	int x,y,prev_x,prev_y = 0;
-
+	/*
 	volatile uint8_t frame_buffer[16];
 	frame_buffer_t fb_t;
 	volatile int32_t fb_flag;
 	frame_bufferInit( &fb_t, 8, 16, 4, (uint8_t *) &frame_buffer, &fb_flag );
-
+	*/
 	Low_init();
 	Dma_init();
 
-	Test_init( &a_test_table );
+	//Test_init( &a_test_table );
 	
 	Uart_init();
 	Spi_init();
@@ -44,8 +44,11 @@ int main(void)
 
 	while (1) {
 
-		Test_start( &a_test_table );
+		//Test_start( &a_test_table );
+
 		Uart_send( "\n", 1 );
+		
+		/*
 		for ( i = 0; i < 16; i++ )
 		{
 			s = sprintf( test, " %x ", frame_buffer[i] );
@@ -78,7 +81,7 @@ int main(void)
 		{
 			y = 0;
 		}
-
+		*/
 		Systick_delayTicks(50000);
 		
 	}

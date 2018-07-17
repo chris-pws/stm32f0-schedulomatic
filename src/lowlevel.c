@@ -58,9 +58,13 @@ void gpio_init(void) {
 	// external pullup
 	gpio_set_output_options( PORT_SPI, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, NSS );
 
-	// Additional software controlled SPI pins
-	gpio_mode_setup( PORT_RST, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST );
+	// Additional pins for OLED display: Reset (RES)
+	gpio_mode_setup( PORT_OLED, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, RST );
 	// external pullup
-	gpio_set_output_options( PORT_RST, GPIO_OTYPE_OD, GPIO_OSPEED_2MHZ, RST );
+	gpio_set_output_options( PORT_OLED, GPIO_OTYPE_OD, GPIO_OSPEED_2MHZ, RST );
+
+	// Additional pins for OLED display: Data/Command Select (DC)
+	gpio_mode_setup( PORT_OLED, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, DC );
+	gpio_set_output_options( PORT_OLED, GPIO_OTYPE_OD, GPIO_OSPEED_2MHZ, DC );
 }
 
