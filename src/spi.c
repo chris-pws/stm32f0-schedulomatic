@@ -9,12 +9,12 @@ void Spi_init(void)
 {
 	spi_reset(SPI1);
 
-	spi_i2s_mode_spi_mode(SPI1);
+	//spi_i2s_mode_spi_mode(SPI1);
 	
 	// Baudrate ( 48000000 / 2 ) 24 MHz
 	spi_init_master( SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_2, 
 		SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE, SPI_CR1_CPHA_CLK_TRANSITION_1, 
-		SPI_CR1_CRCL_8BIT, SPI_CR1_MSBFIRST );
+		SPI_CR1_MSBFIRST );
 
 	spi_set_data_size( SPI1, SPI_CR2_DS_9BIT );
 
@@ -23,7 +23,7 @@ void Spi_init(void)
 	//spi_enable_ss_output(SPI1);
 	Spi_enableNssPulse(SPI1);
 	//spi_enable_software_slave_management(SPI1);
-	//spi_enable_tx_buffer_empty_interrupt(SPI1);
+	//spi_enable_tx_queue_empty_interrupt(SPI1);
 	spi_set_bidirectional_transmit_only_mode(SPI1);
 
 	//spi_enable(SPI1);
@@ -34,20 +34,20 @@ void Spi_init(void)
 // ******* Spi_fifoTxEvent *******
 // Periodic event that manages the SPI transmission queue.
 // Executed from the event scheduler.
-//  Inputs: buffer_param_t pointer, signal flag
+//  Inputs: Queue_t pointer, signal flag
 // Outputs: none
-void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
+void Spi_fifoTxEvent( Queue_t *queue, int *flagPt )
 {
-	uint16_t buf[1], len;
+	int buf[1], len;
 
-	// attempt to read an element from the buffer.
-	if ( ( len = Buffer_get( &buf, buffer, 1 ) ) )
+	// attempt to read an element from the queue.
+	if ( ( len = Queue_get( queue, &buf, 1 ) ) )
 	{
 		// Wait until transaction is complete
 		Sched_flagWait(flagPt);
 		
-		// Send data to the buffer handler function
-		buffer->is.fifo_u16->handler_function( &buf, len );
+		// Send data to the queue transfer handler function
+		queue->handler_function( &buf, len );
 
 		gpio_toggle(GPIOC, GPIO0);
 
@@ -61,7 +61,7 @@ void Spi_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 // channel.
 //  Inputs: pointer to a contiguous block of data, number of elements to copy
 // Outputs: none
-void Spi_dmaTxHandler( volatile void* data, uint8_t length )
+void Spi_dmaTxHandler( volatile void* data, int length )
 {
 	dma_disable_channel( DMA1, DMA_CHANNEL3 );
 
@@ -78,12 +78,12 @@ void Spi_dmaTxHandler( volatile void* data, uint8_t length )
 }
 
 // ******* Spi_send *******
-// Adds arbitrary number of elements to the UART transmission buffer.
+// Adds arbitrary number of elements to the UART transmission queue.
 //  Inputs: pointer to a contiguous block of data, number of elements to copy
 // Outputs: none
-void Spi_send( volatile void* data, uint16_t length )
+void Spi_send( volatile void* data, int length )
 {
-	Buffer_put( data, &fifo_spiTx_param, length );
+	Queue_put( &Q_fifo_u8_spi, data, length );
 
 }
 
@@ -94,7 +94,7 @@ void Spi_send( volatile void* data, uint16_t length )
 // CPHA control registers are 1.
 //  Inputs: SPI peripheral identifier
 // Outputs: none
-void Spi_enableNssPulse( uint32_t spi )
+void Spi_enableNssPulse( int spi )
 {
 	SPI_CR2(spi) |= SPI_CR2_NSSP;
 }

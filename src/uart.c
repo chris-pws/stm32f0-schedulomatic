@@ -20,19 +20,19 @@ void Uart_init(void)
 // ******* Uart_fifoTxEvent *******
 // Periodic event that manages the UART transmit queue.
 // Executed from the event scheduler.
-//  Inputs: buffer_fifo_t pointer, signal flag
+//  Inputs: queue_fifo_t pointer, signal flag
 // Outputs: none
-void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
+void Uart_fifoTxEvent( Queue_t *queue, int *flagPt )
 {
-	uint16_t buf[1], len;
+	int buf[1], len;
 	
-	// attempt to read a byte from the buffer.
-	if ( ( len = Buffer_get( &buf, buffer, 1 ) ) )
+	// attempt to read a byte from the queue.
+	if ( ( len = Queue_get( queue, &buf, 1 ) ) )
 	{
 		// Wait until transfer is complete
 		Sched_flagWait(flagPt);
-		// Copy byte to the buffer handler function
-		buffer->is.fifo_u8->handler_function( &buf, len );
+		// Copy byte to the queue transfer handler function
+		queue->handler_function( &buf, len );
 
 	}
 
@@ -45,7 +45,7 @@ void Uart_fifoTxEvent( buffer_param_t *buffer, int32_t *flagPt )
 //  Inputs: pointer to a contiguous block of data, the number of bytes.
 // (Depending on MSIZE and PSIZE settings in dma__int).
 // Outputs: none
-void Uart_dmaTxHandler( volatile void* data, uint8_t length ) 
+void Uart_dmaTxHandler( volatile void* data, int length ) 
 {
 
 	dma_disable_channel( DMA1, DMA_CHANNEL4 );
@@ -60,12 +60,12 @@ void Uart_dmaTxHandler( volatile void* data, uint8_t length )
 }
 
 // ******* Uart_send *******
-// Adds arbitrary number of bytes to the UART transmission buffer.
+// Adds arbitrary number of bytes to the UART transmission queue.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
-void Uart_send( volatile void* data, uint16_t length ) 
+void Uart_send( volatile void* data, int length ) 
 {
 
-	Buffer_put( data, &fifo_uartTx_param, length );
+	Queue_put( &Q_fifo_u8_uart, data, length );
 
 }

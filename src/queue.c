@@ -1,130 +1,97 @@
 #include "queue.h"
 
-// ******* Queue_Init *******
-// Initializes a queue parameter structure, preparing it for usage.
-// Inputs: Pointer to queue_param_t.
-//		   Function pointer called by the event scheduler to handle queue 
-//		   processing.
-// Ouputs: None
-void Queue_init( Queue_t *me, int size, struct queue_data *my, 
+/********* Queue_init *******
+* Initializes a queue structure, preparing it for usage.
+* Inputs: Pointer to Queue_t, number of elements as size, queue_data pointer,
+*         pointer to a putFunction and a getFunction,
+*		  function pointer callback to handle queue xfer from the scheduler.
+* Ouputs: None
+*/
+void Queue_init( Queue_t *me, int size, struct queue_data *data, 
 	int *flagSize, 
-	void(*initFunction)( Queue_t *me ),
-	void(*putFunction)( Queue_t *me, volatile void *in_buf, int length ), 
-	void(*getFunction)( Queue_t *me, volatile void *out_buf, int length ),
+	int(*putFunction)( Queue_t *me, volatile void *in_buf, int length ), 
+	int(*getFunction)( Queue_t *me, volatile void *out_buf, int length ),
 	void(*handler)( volatile void *data, int length ) )
 {
-	switch ( queue->type )
-	{
-		case FIFO_U8T:
-		{
-			queue->is.fifo_u8->data = data;
-			queue->is.fifo_u8->getIndex = 0;
-			queue->is.fifo_u8->putIndex = 0;
-			queue->is.fifo_u8->size = size;
-			queue->is.fifo_u8->handler_function = handler;
-			queue->flagSize = flagSize;
+	me->size = size;
+	me->flagSize = flagSize;
+	me->handler_function = handler;
 
-		}
+	me->queue = data;
+	me->getIndex = 0;
+	me->putIndex = 0;
 
-		case FIFO_U16T:
-		{
-			queue->is.fifo_u16->getPt = (uint16_t*)&queue->is.fifo_u16->data[0];
-			queue->is.fifo_u16->putPt = (uint16_t*)&queue->is.fifo_u16->data[0];
-			queue->is.fifo_u16->handler_function = handler;
-			queue->flagSize = flagSize;
-
-		}
-	}
-
+	me->putFunction = putFunction;
+	me->getFunction = getFunction;
 }
 
-// ******* Queue_put *******
-// Public function that appends data to a specified queue based on the
-// queue parameter structure provided.
-//  Inputs: pointer to data, pointer to a queue_param_t, data length
-// Outputs: number of elements inserted successfully
-int Queue_put( volatile void *in_buf, Queue_t *me, int length )
+/********* Queue_put *******
+* Public function that appends data to a specified queue based on the
+* queue parameter structure provided.
+*  Inputs: pointer to data, pointer to a Queue_t, data length
+* Outputs: number of elements inserted successfully
+*/
+int Queue_put( Queue_t *me, volatile void *in_buf, int length )
 {
-	uint16_t num_queued;
+	int num_queued;
 
 	cm_disable_interrupts();
+	
 	/*
-	*  Call the specialized helper function corresponding to the supplied 
-	*  queue parameters.
+	*  Call the specialized Queue_put function as assigned in Queue_init()
 	*/
-	switch ( queue->type )
-	{
 
-		case FIFO_U8T:
-			num_queued = queue_fifo_u8_put( in_buf, queue->is.fifo_u8, length );
-			Queue_flagSizeAdd( queue->flagSize, num_queued );
-			cm_enable_interrupts();
-			return num_queued; // return number of data added to the queue
-			break;
+	num_queued = me->putFunction( me, in_buf, length );
 
+	/*
+	*  Add the number of elements successfully appended to the queue.
+	*/
 
-		case FIFO_U16T:
-			num_queued = queue_fifo_u16_put( in_buf, queue->is.fifo_u16, length );
-			Queue_flagSizeAdd( queue->flagSize, num_queued );
-			//Test_in( &a_test_table, num_queued );
-			cm_enable_interrupts();
-			return num_queued; // return number of data added to the queue
-			break;
-	}
+	Queue_flagSizeAdd( me->flagSize, num_queued );
 
 	cm_enable_interrupts();
-	return 0;
+
+	return num_queued;
 }
 
 // ******* Queue_get *******
 // Public function that retrieves and removes data from a queue corresponding
 // to the supplied queue parameter structure.
-//  Inputs: data pointer, queue_param_t pointer, and number of elements to
+//  Inputs: data pointer, Queue_t pointer, and number of elements to
 //          read.
 // Outputs: number of elements read into the data pointer.
-int Queue_get( volatile void *out_buf, Queue_t *me, int length )
+int Queue_get( Queue_t *me, volatile void *out_buf, int length )
 {
-	uint16_t num_read;
+	int num_read;
 
 	cm_disable_interrupts();
+
 	/*
-	*  Call the specialized helper function corresponding to the supplied 
-	*  queue parameters.
+	*  Call the specialized Queue_get function as assigned in Queue_init().
 	*/
-	switch ( queue->type )
-	{
 
-		case FIFO_U8T:
-			num_read = queue_fifo_u8_get( out_buf, queue->is.fifo_u8, length );
-			Queue_flagSizeSub( queue->flagSize, num_read );
-			cm_enable_interrupts();
-			return num_read;
-			break;
+	num_read = me->getFunction( me, out_buf, length );
 
-		case FIFO_U16T:
+	/*
+	*  Subtract the number of elements successfully read from the queue.
+	*/
 
-			num_read = queue_fifo_u16_get( out_buf, queue->is.fifo_u16, length );
-			Queue_flagSizeSub( queue->flagSize, num_read );
-			//Test_out( &a_test_table, num_read );
-			cm_enable_interrupts();
-			return num_read;
-			break;
-
-	}
+	Queue_flagSizeSub( me->flagSize, num_read );
 
 	cm_enable_interrupts();
-	return 0;
+
+	return num_read;
 }
 
 // ******* queue_fifo_u8_put *******
 // Private function that appends data to a supplied queue.
 //  Inputs: pointer to data, pointer to a queue_fifo_t, data length
 // Outputs: number of elements inserted successfully
-int queue_fifo_u8_put( volatile void *in_buf, Queue_t *me, int length )
+int queue_fifo_u8_put( Queue_t *me, volatile void *in_buf, int length )
 {
 
-	uint16_t j;
-	uint16_t nextPutIndex;
+	int j;
+	int nextPutIndex;
 	volatile uint8_t *p;
 
 	p = in_buf;
@@ -138,21 +105,21 @@ int queue_fifo_u8_put( volatile void *in_buf, Queue_t *me, int length )
 		*  by writing to its index variables only after this test passes.
 		*/ 
 
-		nextPutIndex = b_u8t->putIndex + 1;
+		nextPutIndex = me->putIndex + 1;
 
-		if ( nextPutIndex == ( b_u8t->size - 1 ) )
+		if ( nextPutIndex == ( me->size - 1 ) )
 		{
 			nextPutIndex = 0;
 		}
 		
-		if ( nextPutIndex == b_u8t->getIndex )
+		if ( nextPutIndex == me->getIndex )
 		{
-			return j; // no vacancy, return number of elements fetched
+			return j; // no vacancy, return number of elements fetched so far
 		}
 
-		b_u8t->data[b_u8t->putIndex] = *p++;
+		me->queue->is.fifo_u8->data[me->putIndex] = *p++;
 		// Set putIndex to the next element
-		b_u8t->putIndex = nextPutIndex;
+		me->putIndex = nextPutIndex;
 		
 	}
 	return j; // return number of data added to the queue
@@ -162,27 +129,27 @@ int queue_fifo_u8_put( volatile void *in_buf, Queue_t *me, int length )
 // Private function to retrieve and remove data from a specified queue.
 //  Inputs: data pointer, queue_fifo_t pointer, and number of elements to read
 // Outputs: number of elements read into the data pointer.
-int queue_fifo_u8_get( volatile void *out_buf, Queue_t *me, int length )
+int queue_fifo_u8_get( Queue_t *me, volatile void *out_buf, int length )
 {
 
-	uint16_t j;
+	int j;
 	volatile uint8_t *p;
 
 	p = out_buf;
 
 	for ( j = 0; j < length; j++ ) 
 	{	
-		// Check for get & put index collision
-		if ( b_u8t->getIndex != b_u8t->putIndex )
+		// Check for get & put index collision == empty condition
+		if ( me->getIndex != me->putIndex )
 		{
-			*p++ = b_u8t->data[b_u8t->getIndex];
+			*p++ = me->queue->is.fifo_u8->data[me->getIndex];
 
-			b_u8t->getIndex += 1;
+			me->getIndex += 1;
 
 			// Check for index wrap-around
-			if ( b_u8t->getIndex == ( b_u8t->size - 1 ) )
+			if ( me->getIndex == ( me->size - 1 ) )
 			{
-				b_u8t->getIndex = 0;
+				me->getIndex = 0;
 			}
 
 		}
@@ -201,11 +168,11 @@ int queue_fifo_u8_get( volatile void *out_buf, Queue_t *me, int length )
 // Private function that appends data to a supplied queue.
 //  Inputs: pointer to data, pointer to a queue_fifo_t, data length
 // Outputs: number of elements inserted successfully
-int queue_fifo_u16_put( volatile void *in_buf, Queue_t *me, int length )
+int queue_fifo_u16_put( Queue_t *me, volatile void *in_buf, int length )
 {
 
-	uint16_t j;
-	uint16_t *nextPutPt;
+	int j;
+	int nextPutIndex;
 
 	volatile uint16_t *p;
 
@@ -214,31 +181,29 @@ int queue_fifo_u16_put( volatile void *in_buf, Queue_t *me, int length )
 	for ( j = 0; j < length; j++ )
 	{
 		/* Testing for queue overflow
-		*  First handle wrapping if we've reached the queuesize. Check to see
+		*  First handle wrapping if we've reached the queue size. Check to see
 		*  if there's space in the queue: full condition reached when the
-		*  advancing putPt meets the getPt. 
+		*  advancing putIndex meets the getIndex. We avoid corrupting the queue
+		*  by writing to its index variables only after this test passes.
 		*/ 
 
-		nextPutPt = (uint16_t*)( b_u16t->putPt + 1 );
+		nextPutIndex = me->putIndex + 1;
 
-		if ( nextPutPt == (uint16_t*)&b_u16t->data[B_SIZE_FIFO_U16T] ) 
+		if ( nextPutIndex == ( me->size - 1 ) )
 		{
-			nextPutPt = (uint16_t*)&b_u16t->data[0];
+			nextPutIndex = 0;
 		}
 		
-		if ( nextPutPt == b_u16t->getPt )
+		if ( nextPutIndex == me->getIndex )
 		{
-
-			Uart_send( "x", 1 );
-			return j; // no vacancy, return number of elements fetched
+			return j; // no vacancy, return number of elements fetched so far
 		}
 
-		(*b_u16t->putPt) = *p++;
-		// Set putPt address to the next element
-		b_u16t->putPt = nextPutPt;
+		me->queue->is.fifo_u16->data[me->putIndex] = *p++;
+		// Set putIndex to the next element
+		me->putIndex = nextPutIndex;
 		
 	}
-
 	return j; // return number of data added to the queue
 }
 
@@ -246,7 +211,7 @@ int queue_fifo_u16_put( volatile void *in_buf, Queue_t *me, int length )
 // Private function to retrieve and remove data from a specified queue.
 //  Inputs: data pointer, queue_fifo_t pointer, and number of elements to read
 // Outputs: number of elements read into the data pointer.
-int queue_fifo_u16_get( volatile void *out_buf, Queue_t *me, int length )
+int queue_fifo_u16_get( Queue_t *me, volatile void *out_buf, int length )
 {
 
 	uint16_t j;
@@ -256,25 +221,24 @@ int queue_fifo_u16_get( volatile void *out_buf, Queue_t *me, int length )
 
 	for ( j = 0; j < length; j++ ) 
 	{	
-		// Check for get & put pointer collision
-		if ( b_u16t->getPt != b_u16t->putPt )
+		// Check for get & put index collision == empty condition
+		if ( me->getIndex != me->putIndex )
 		{
+			*p++ = me->queue->is.fifo_u16->data[me->getIndex];
 
-			*p++ = (*b_u16t->getPt);
+			me->getIndex += 1;
 
-			b_u16t->getPt = (uint16_t*)&b_u16t->getPt[1];
-
-			// Check for pointer wrap-around
-			if ( b_u16t->getPt == (uint16_t*)&b_u16t->data[B_SIZE_FIFO_U16T] )
+			// Check for index wrap-around
+			if ( me->getIndex == ( me->size - 1 ) )
 			{
-				b_u16t->getPt = (uint16_t*)&b_u16t->data[0];
+				me->getIndex = 0;
 			}
 
 		}
 		else
 		{
+
 			// Nothing left, return number of elements retrieved.
-			Uart_send( "j", 1 );
 			return j;
 		}
 	}
