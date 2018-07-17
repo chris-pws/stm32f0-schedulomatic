@@ -47,7 +47,7 @@ void Test_end( volatile test_table_t *t )
 *  Inputs: A test_table struct, uint32_t in value
 * Outputs: none
 */
-void Test_in( volatile test_table_t *t, uint32_t in )
+void Test_in( volatile test_table_t *t, int in )
 {
 
 	t->in += in;
@@ -59,7 +59,7 @@ void Test_in( volatile test_table_t *t, uint32_t in )
 *  Inputs: A test_table struct, uint32_t out value
 * Outputs: none
 */
-void Test_out( volatile test_table_t *t, uint32_t out )
+void Test_out( volatile test_table_t *t, int out )
 {
 
 	t->out += out;
@@ -76,16 +76,16 @@ void Test_calculate( volatile test_table_t *t )
 {
 	char out_time_buf[120];
 	char out_element_buf[120];
-	uint32_t s;
+	int s;
 
 	int64_t in_out_diff = t->in - t->out;
-	uint32_t start_end_diff = Systick_timeDelta( t->start, t->end );
+	int start_end_diff = Systick_timeDelta( t->start, t->end );
 
-	s = sprintf( out_time_buf, " Start: %lu End: %lu Duration: %lu ", t->start, t->end,
+	s = sprintf( out_time_buf, " Start: %u End: %u Duration: %u ", t->start, t->end,
 				 start_end_diff );
 	Uart_send( out_time_buf, s );
 
-	s = sprintf( out_element_buf, " In: %lu Out: %lu Difference: %lli ", t->in, t->out,
+	s = sprintf( out_element_buf, " In: %u Out: %u Difference: %lli ", t->in, t->out,
 				 in_out_diff );
 	Uart_send( out_element_buf, s );
 }

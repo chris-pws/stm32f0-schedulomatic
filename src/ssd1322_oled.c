@@ -84,11 +84,11 @@ void Oled_init(void)
 void Oled_reset(void)
 {
 
-	gpio_clear( PORT_RST, RST );
+	gpio_clear( PORT_OLED, RST );
 
 	Systick_delayTicks(1);
 
-	gpio_set( PORT_RST, RST );
+	gpio_set( PORT_OLED, RST );
 /*
 	Systick_delayTicks(500);
 

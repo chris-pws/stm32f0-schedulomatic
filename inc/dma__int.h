@@ -10,9 +10,9 @@
 #include <libopencm3/stm32/f0/dma.h>
 #include <libopencm3/cm3/systick.h>
 
-extern int32_t Flag_DMA_Chan3;
-extern int32_t Flag_DMA_Chan4;
-extern uint32_t systickCount;
+extern int Flag_DMA_Chan3;
+extern int Flag_DMA_Chan4;
+extern int systickCount;
 
 // ******* Dma_init *******
 // Meta function that initializes the DMA peripheral.
@@ -44,7 +44,7 @@ void dma_spiTxInit(void);
 // Increment semaphore
 //  Inputs: pointer to a counting semaphore
 // Outputs: none
-extern void Sched_flagSignal( int32_t *semaPt );
+extern void Sched_flagSignal( int *semaPt );
 
 // ******* Sched_runEventManager *******
 // Runs scheduler event manager
@@ -56,7 +56,7 @@ extern void Sched_runEventManager(void);
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
-extern void Uart_send( volatile void* data, uint16_t length );
+extern void Uart_send( volatile void* data, int length );
 
 #define DMA__INT_H_ 1
 #endif

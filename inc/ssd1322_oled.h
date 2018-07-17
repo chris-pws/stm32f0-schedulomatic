@@ -109,13 +109,13 @@ void Oled_sendData( uint8_t data );
 // Adds arbitrary number of elements to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, number of elements to copy
 // Outputs: none
-extern void Spi_send( volatile void* data, uint16_t length );
+extern void Spi_send( volatile void* data, int length );
 
 // ******* Uart_send *******
 // Adds arbitrary number of bytes to the UART transmission buffer.
 //  Inputs: pointer to a contiguous block of data, the number of bytes
 // Outputs: none
-extern void Uart_send( volatile void* data, uint16_t length );
+extern void Uart_send( volatile void* data, int length );
 
 #define SSD1322_OLED_H_ 1
 #endif
