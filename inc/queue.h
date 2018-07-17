@@ -5,10 +5,8 @@
 #include <libopencm3/cm3/cortex.h>
 #include <libopencm3/stm32/gpio.h>
 
-#include "test.h"
-
-#define B_SIZE_FIFO_U8T 128
-#define B_SIZE_FIFO_U16T 2048
+#define B_SIZE_FIFO_UART 128
+#define B_SIZE_FIFO_SPI 2048
 #define B_SIZE_TEST 8
 
 struct queue_fifo_u8
@@ -104,14 +102,6 @@ int Queue_put( Queue_t *me, volatile void *in_buf, int length );
 * Outputs: number of elements read into the data pointer.
 */
 int Queue_get( Queue_t *me, volatile void *out_buf, int length );
-
-/********* queue_fifo_u8_init *******
-* Private constructor function that initializes the provided Queue_t type with
-* the queue_data specific to the fifo_u8 queue type.
-*  Inputs: pointer to Queue_t, pointer to queue_data struct
-* Outputs: none
-*/
-void queue_fifo_u8_init( Queue_t *me, struct queue_data *my );
 
 /********* queue_fifo_u8_put *******
 * Private function that appends data to a supplied queue.

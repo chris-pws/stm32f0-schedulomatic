@@ -28,8 +28,8 @@ int Flag_queueSize_spi;
 /* Allocate data stores for queues
 */
 
-volatile uint8_t fifo_uartTxData[B_SIZE_FIFO_U8T];
-volatile uint8_t fifo_spiTxData[B_SIZE_FIFO_U16T];
+volatile uint8_t fifo_uartTxData[B_SIZE_FIFO_UART];
+volatile uint8_t fifo_spiTxData[B_SIZE_FIFO_SPI];
 volatile uint16_t fifo_testData[B_SIZE_TEST];
 
 /* Assign data stores to queue_data types
