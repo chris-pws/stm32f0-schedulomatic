@@ -46,7 +46,7 @@ int main(void)
 
 		//Test_start( &a_test_table );
 
-		Uart_send( "\n", 1 );
+		Uart_send( " Fluffy cats shed hair everywhere ", 34 );
 		
 		/*
 		for ( i = 0; i < 16; i++ )
@@ -82,7 +82,7 @@ int main(void)
 			y = 0;
 		}
 		*/
-		Systick_delayTicks(50000);
+		Systick_delayTicks(5000);
 		
 	}
 	return 0;

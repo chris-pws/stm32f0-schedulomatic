@@ -1,10 +1,11 @@
 #include "spi.h"
 
-// ******* Spi_init *******
-// Initializes the SPI peripheral for simplex serial transmission.
-// 9 bits per word
-//  Inputs: none
-// Outputs: none
+/********* Spi_init *******
+*  Initializes the SPI peripheral for simplex serial transmission.
+*  8 bits per word
+*   Inputs: none
+*  Outputs: none
+*/
 void Spi_init(void)
 {
 	spi_reset(SPI1);
@@ -31,11 +32,12 @@ void Spi_init(void)
 
 }
 
-// ******* Spi_fifoTxEvent *******
-// Periodic event that manages the SPI transmission queue.
-// Executed from the event scheduler.
-//  Inputs: Queue_t pointer, signal flag
-// Outputs: none
+/********* Spi_fifoTxEvent *******
+*  Periodic event that manages the SPI transmission queue.
+*  Executed from the event scheduler.
+*   Inputs: Queue_t pointer, signal flag
+*  Outputs: none
+*/
 void Spi_fifoTxEvent( Queue_t *queue, int *flagPt )
 {
 	int buf[1], len;
@@ -56,11 +58,12 @@ void Spi_fifoTxEvent( Queue_t *queue, int *flagPt )
 	//gpio_toggle(GPIOB, GPIO3);
 }
 
-// ******* Spi_dmaTxHandler *******
-// Copies data from a memory address to the SPI peripheral DMA transmission 
-// channel.
-//  Inputs: pointer to a contiguous block of data, number of elements to copy
-// Outputs: none
+/********* Spi_dmaTxHandler *******
+*  Copies data from a memory address to the SPI peripheral DMA transmission 
+*  channel.
+*   Inputs: pointer to a contiguous block of data, number of elements to copy
+*  Outputs: none
+*/
 void Spi_dmaTxHandler( volatile void* data, int length )
 {
 	dma_disable_channel( DMA1, DMA_CHANNEL3 );
@@ -77,23 +80,25 @@ void Spi_dmaTxHandler( volatile void* data, int length )
 	
 }
 
-// ******* Spi_send *******
-// Adds arbitrary number of elements to the UART transmission queue.
-//  Inputs: pointer to a contiguous block of data, number of elements to copy
-// Outputs: none
+/********* Spi_send *******
+*  Adds arbitrary number of elements to the UART transmission buffer.
+*   Inputs: pointer to a contiguous block of data, number of elements to copy
+*  Outputs: none
+*/
 void Spi_send( volatile void* data, int length )
 {
 	Queue_put( &Q_fifo_u8_spi, data, length );
 
 }
 
-// ******* Spi_enableNssPulse *******
-// Enables SPI to generate an NSS pulse between two consecutive words while
-// performing consecutive transfers. The NSS is held high when transfers are
-// complete. Applies only to master mode, and has no effect when FRF or
-// CPHA control registers are 1.
-//  Inputs: SPI peripheral identifier
-// Outputs: none
+/********* Spi_enableNssPulse *******
+*  Enables SPI to generate an NSS pulse between two consecutive words while
+*  performing consecutive transfers. The NSS is held high when transfers are
+*  complete. Applies only to master mode, and has no effect when FRF or
+*  CPHA control registers are 1.
+*   Inputs: SPI peripheral address identifier
+*  Outputs: none
+*/
 void Spi_enableNssPulse( int spi )
 {
 	SPI_CR2(spi) |= SPI_CR2_NSSP;

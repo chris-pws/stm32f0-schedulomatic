@@ -36,72 +36,72 @@
 #define OLED_MAGIC_2 0x0D1
 
 /******** Oled_init *********
-* Initializes the display controller.
-*  Inputs: none
-* Outputs: none
+*  Initializes the display controller.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_init(void);
 
 /******** Oled_reset *********
-* Sends a reset sequence to the ssd1322.
-*  Inputs: none
-* Outputs: none
+*  Sends a reset sequence to the ssd1322.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_reset(void);
 
 /******** Oled_clear *********
-* Clears the ssd1322 display memory.
-*  Inputs: none
-* Outputs: none
+*  Clears the ssd1322 display memory.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_clear(void);
 
 /******** Oled_on *********
-* Turns the ssd1322 display on.
-*  Inputs: none
-* Outputs: none
+*  Turns the ssd1322 display on.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_on(void);
 
 /******** Oled_off *********
-* Switches the display matrix off.
-*  Inputs: none
-* Outputs: none
+*  Switches the display matrix off.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_off(void);
 
 /******** Oled_invert *********
-* Inverts the current contents of the graphic display RAM.
-*  Inputs: none
-* Outputs: none
+*  Inverts the current contents of the graphic display RAM.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_invert(void);
 
 /******** Oled_normal *********
-* Restores the display to normal mode.
-*  Inputs: none
-* Outputs: none
+*  Restores the display to normal mode.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_normal(void);
 
 /******** Oled_test *********
-* Test command sequence.
-*  Inputs: none
-* Outputs: none
+*  Test command sequence.
+*   Inputs: none
+*  Outputs: none
 */
 void Oled_test(void);
 
 /******** Oled_sendCmd *********
-* Sends a single byte command to the display controller.
-*  Inputs: a single command byte
-* Outputs: none
+*  Sends a single byte command to the display controller.
+*   Inputs: a single command byte
+*  Outputs: none
 */
 void Oled_sendCmd( uint8_t cmd );
 
 /******** Oled_sendData *********
-* Sends a single byte of data to the display controller.
-*  Inputs: a single data byte
-* Outputs: none
+*  Sends a single byte of data to the display controller.
+*   Inputs: a single data byte
+*  Outputs: none
 */
 void Oled_sendData( uint8_t data );
 
@@ -111,10 +111,11 @@ void Oled_sendData( uint8_t data );
 // Outputs: none
 extern void Spi_send( volatile void* data, int length );
 
-// ******* Uart_send *******
-// Adds arbitrary number of bytes to the UART transmission buffer.
-//  Inputs: pointer to a contiguous block of data, the number of bytes
-// Outputs: none
+/********* Uart_send *******
+*  Adds arbitrary number of bytes to the UART transmission queue.
+*   Inputs: pointer to a contiguous block of data, the number of bytes to read.
+*  Outputs: none
+*/
 extern void Uart_send( volatile void* data, int length );
 
 #define SSD1322_OLED_H_ 1

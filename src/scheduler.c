@@ -1,39 +1,33 @@
 #include "scheduler.h"
 
-/* Create an event table holder
-*/
+/* Create an event table holder */
 
 struct sched_eventTable events[NUMEVENTS];
 
-/* Create mutex flags for communication channels
-*/
+/* Create mutex flags for communication channels */
 
 int Flag_DMA_Chan3;
 int Flag_DMA_Chan4;
 int Flag_test;
 
-/* Instantiate Queue structures
-*/
+/* Instantiate Queue structures */
 
 Queue_t Q_fifo_u8_uart;
 Queue_t Q_fifo_u8_spi;
 Queue_t Q_fifo_u16_test;
 
-/* Create counting flags to track queue sizes
-*/
+/* Create counting flags to track queue sizes */
 
 int Flag_queueSize_uart;
 int Flag_queueSize_spi;
 
-/* Allocate data stores for queues
-*/
+/* Allocate data stores for queues */
 
 volatile uint8_t fifo_uartTxData[B_SIZE_FIFO_UART];
 volatile uint8_t fifo_spiTxData[B_SIZE_FIFO_SPI];
 volatile uint16_t fifo_testData[B_SIZE_TEST];
 
-/* Assign data stores to queue_data types
-*/
+/* Assign data stores to queue_data types */
 
 struct queue_fifo_u8 fifo_uartTx =
 	{ .data = fifo_uartTxData };
@@ -44,8 +38,7 @@ struct queue_fifo_u8 fifo_spiTx =
 struct queue_fifo_u16 fifo_test =
 	{ .data = fifo_testData };
 
-/* Initialize queue_data structs for each queue
-*/
+/* Initialize queue_data structs for each queue */
 
 struct queue_data fifo_uartTx_data = 
     { .format = FIFO_U8T, .is= { .fifo_u8 = &fifo_uartTx } };
@@ -56,7 +49,7 @@ struct queue_data fifo_spiTx_data =
 struct queue_data fifo_test_data = 
     { .format = FIFO_U16T, .is= { .fifo_u16= &fifo_test } };
 
-/* ******* Sched_Init *******
+/********* Sched_Init *******
 *  Initializes system task fixed rate scheduler.
 */
 void Sched_init(void) {
@@ -71,8 +64,8 @@ void Sched_init(void) {
 	Queue_flagSizeInit( &Flag_queueSize_spi );
 
 	/* Initialize queue size setting */ 
-	const int sizeUart = B_SIZE_FIFO_U8T;
-	const int sizeSpi = B_SIZE_FIFO_U16T;
+	const int sizeUart = B_SIZE_FIFO_UART;
+	const int sizeSpi = B_SIZE_FIFO_SPI;
 	const int sizeTest = B_SIZE_TEST;
 
 	/* Initialize queue_param objects providing: pointer to queue_param_t, 
