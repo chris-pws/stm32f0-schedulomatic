@@ -46,3 +46,14 @@ stm32f031f4\.ld
 stm32f031k6\.ld
 
 inc/buffer\.h
+
+inc/frame\.h
+
+inc/sprite\.h
+
+inc/buffer\.h
+
+src/frame\.c
+
+src/buffer\.c
+
